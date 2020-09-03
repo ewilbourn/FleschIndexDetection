@@ -8,7 +8,11 @@ public class flesch
 	{
 		Scanner in = new Scanner (System.in);
 		System.out.print("Enter the name of the input file: ");
+		
+
+		//read in input from the user; this is reading in the input file
 		String inputFile = in.nextLine();
+
 		readFiles(inputFile);	
 	}	
 
