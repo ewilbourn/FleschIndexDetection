@@ -9,19 +9,25 @@ public class flesch
 		Scanner in = new Scanner (System.in);
 		System.out.print("Enter the name of the input file: ");
 		String inputFile = in.nextLine();
-		//System.out.print(inputFile);
 		readFiles(inputFile);	
 	}	
 
+	
+	//precondition: reads in a String value, which is the name of the file
+	//we're reading in
+	//
+	//postcondition: the contents of the file we passed in are printed to the
+	//screen
 	public static void readFiles(String input) throws FileNotFoundException
 	{
-        	Scanner in = new Scanner(new File(input));
+        	Scanner sc = new Scanner(new File(input));
         	System.out.println("Hello.");
-		while (in.hasNextLine())
+		while (sc.hasNextLine())
         	{
                 	System.out.println("I am in the while loop.");
-			System.out.println(in.nextLine());
+			System.out.println(sc.nextLine());
         	}
+		sc.close();
 		System.out.println("Bye.");
 	}
 
