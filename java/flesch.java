@@ -12,26 +12,28 @@ public class flesch
 	
 		//read in input from the user; this is reading in the input file
 		String inputFile = in.nextLine();
-
-		readFiles(inputFile);	
+		
+		ArrayList <String> words = new ArrayList <String>();	
+		words = findWords(words, inputFile);	
 	}	
 
 	
-	//precondition: reads in a String value, which is the name of the file
+	//precondition: reads in an ArrayList of Strings, which we will be modifying
+	//and returning, and a String value, which is the name of the file
 	//we're reading in
 	//
-	//postcondition: the contents of the file we passed in are printed to the
-	//screen
-	public static void readFiles(String input) throws IOException
+	//postcondition: the contents of the file we passed in are added to an 
+	//ArrayList, which is returned
+	public static ArrayList<String> findWords(ArrayList<String> words, String input) throws IOException
 	{
         	Scanner sc = new Scanner(new File(input));
-		ArrayList <String> words = new ArrayList <String>();
 		while(sc.hasNext())
         	{
         		words.add(sc.next());	
 		}
 
 		sc.close();
+		return words;
 	}
 
 }
