@@ -7,9 +7,9 @@ public class flesch
 	public static void main(String[] args) throws IOException
 	{
 		Scanner in = new Scanner (System.in);
+		File directoryPath = new File("/pub/pounds/CSC330/translations");
 		System.out.print("Enter the name of the input file: ");
-		
-
+	
 		//read in input from the user; this is reading in the input file
 		String inputFile = in.nextLine();
 
@@ -22,17 +22,16 @@ public class flesch
 	//
 	//postcondition: the contents of the file we passed in are printed to the
 	//screen
-	public static void readFiles(String input) throws FileNotFoundException
+	public static void readFiles(String input) throws IOException
 	{
         	Scanner sc = new Scanner(new File(input));
-        	System.out.println("Hello.");
-		while (sc.hasNextLine())
+		ArrayList <String> words = new ArrayList <String>();
+		while(sc.hasNext())
         	{
-                	System.out.println("I am in the while loop.");
-			System.out.println(sc.nextLine());
-        	}
+        		words.add(sc.next());	
+		}
+
 		sc.close();
-		System.out.println("Bye.");
 	}
 
 }
