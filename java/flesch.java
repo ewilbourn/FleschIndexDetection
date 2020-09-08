@@ -14,7 +14,12 @@ public class flesch
 		String inputFile = in.nextLine();
 		
 		ArrayList <String> words = new ArrayList <String>();	
-		words = findWords(words, inputFile);	
+		words = findWords(words, inputFile);
+
+		for (int i = 0; i < words.size(); i++)
+		{
+			System.out.println(words.get(i));
+		}	
 	}	
 
 	
@@ -29,12 +34,31 @@ public class flesch
         	Scanner sc = new Scanner(new File(input));
 		while(sc.hasNext())
         	{
-        		words.add(sc.next());	
+
+        		try 
+			{
+           			Double.parseDouble(sc.next());
+        		} 
+			catch (NumberFormatException e) 
+			{
+				//if the word, sc.next(), is not a number, add it to the ArrayList
+				words.add(sc.next());
+			}	
 		}
 
 		sc.close();
 		return words;
 	}
+	
+	//add method to determine if a char is a vowel
+	
 
+	//add method to determine if a word is actually a number
+	
+
+	//add method to determine how many syllables a word has (will need to call vowel method)
+	//probably need to look at each word and then see where the vowels are and count the number of vowels? 
+	//but if vowels are next to each other, they don't make up two different syllables
+	
 }
 
