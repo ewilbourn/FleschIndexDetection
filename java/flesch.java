@@ -51,7 +51,7 @@ public class flesch
 	//method to determine if a word is actually a number
 	//precondition: passes in a string
 	//postcondition: returns a boolean that tells us if the string is a number
-	static boolean isNumber(String str)
+	public static boolean isNumber(String str)
 	{	
 		int counter = 0;
 		
