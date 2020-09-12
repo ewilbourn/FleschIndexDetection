@@ -46,7 +46,16 @@ public class flesch
 	}
 	
 	//add method to determine if a char is a vowel
-	
+	public static boolean isVowel(char c)
+	{
+		char [] vowels = {'a', 'e', 'i', 'o', 'u','y'};
+		for(char vowel:vowels)
+		{
+			if (Character.compare(Character.toLowerCase(c), vowel) == 0)
+				return true;
+		}
+		return false;
+	}	
 
 	//method to determine if a word is actually a number
 	//precondition: passes in a string
