@@ -45,7 +45,9 @@ public class flesch
 		return words;
 	}
 	
-	//add method to determine if a char is a vowel
+	//method to determine if a char is a vowel
+	//precondition: passes in a character
+	//postcondition: returns a boolean that tells us if the char is a vowel
 	public static boolean isVowel(char c)
 	{
 		char [] vowels = {'a', 'e', 'i', 'o', 'u','y'};
