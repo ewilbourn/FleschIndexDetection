@@ -13,11 +13,7 @@ public class flesch
 		//read in input from the user; this is reading in the input file
 		String inputFile = in.nextLine();
 		ArrayList <String> words = new ArrayList <String>();
-		findWords(words,inputFile);
-		for (int i = 0; i < words.size(); i++)
-		{
-			System.out.println(words.get(i) + " ");
-		}
+		words = findWords(words,inputFile);
 	}	
 
 	
