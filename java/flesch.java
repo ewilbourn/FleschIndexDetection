@@ -66,7 +66,7 @@ public class flesch
 		for (int i = 0; i < str.length(); i++)
 			if (Character.isDigit(str.charAt(i)) == true)
 				counter += 1;
-		//if counter equals str.lenght(), it means that every char in the 
+		//if counter equals str.length(), it means that every char in the 
 		//string is a digit, which means that we have a number
 		return (counter == str.length() ? true : false); 
 	}	
