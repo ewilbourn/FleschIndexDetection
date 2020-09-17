@@ -14,6 +14,10 @@ public class flesch
 		String inputFile = in.nextLine();
 		ArrayList <String> words = new ArrayList <String>();
 		words = findWords(words,inputFile);
+	
+		int numSentences = countSentences(words);
+		int numWords = totalWords (words);
+		System.out.println("Word Count: " + numWords + "\nSentence Count: " + numSentences);
 	}	
 
 	
@@ -59,13 +63,13 @@ public class flesch
 	//postcondition: returns a boolean that tells us if the string is a number
 	public static boolean isNumber(String str)
 	{	
-		//return str.matches("[-+]?\\d+(\\.\\d+)?");
 		int counter = 0;
 		
 		//loop that increments counter when the character is a digit
 		for (int i = 0; i < str.length(); i++)
 			if (Character.isDigit(str.charAt(i)) == true)
 				counter += 1;
+		
 		//if counter equals str.length(), it means that every char in the 
 		//string is a digit, which means that we have a number
 		return (counter == str.length() ? true : false); 
@@ -78,7 +82,8 @@ public class flesch
 	{
 		int syllables = 0;
 		BitSet vowel_positions = new BitSet (word.length());
-		//loop that increments counter when the character is a digit
+		
+		//loop that sets the bit in a BitSet to true when we have a vowel
 		for (int i = 0; i < word.length(); i++)
 			if (isVowel(word.charAt(i)))
                   	      vowel_positions.set(i);
@@ -87,6 +92,8 @@ public class flesch
 
 	
 	//method to count the total number of syllables in the text file
+	//precondition: pass in the ArrayList of words
+	//postcondition: return an integer with the number of syllables in the ArrayList
 	public static int totalSyllables(ArrayList <String> words)
 	{
 		int syllables = 0;
@@ -104,11 +111,53 @@ public class flesch
 	{
 		return words.size();
 	}
-	//add method to determine the number of sentences in the file
-	//a sentence is ended by a period, colon, semicolon, question mark, 
-	//or exclamation mark
+	//method to count the total number of sentences in a text file
+	//precondition: passes in an ArrayList of Strings that has all the words from the file
+	//postcondition: returns an integer with the number of sentences
+	public static int countSentences(ArrayList<String> words)
+	{
+		int numSentences = 0;
 	
-
+		for (int i = 0; i < words.size(); i++)
+		{
+			if(findSentence(words.get(i)))
+				numSentences += 1;
+		}
+		return numSentences;
+	}
+	//method to determine if a word contains punctuation, and then represents
+	//the end of a sentence in the file
+	//precondition: passes in a string
+	//postcondition: returns a boolean (true if the word has punctuation, false if it
+	//does not
+	public static boolean findSentence (String word)
+	{
+		List<Character> chars = new ArrayList<Character>();	
+		for (int i = 0; i < word.length(); i++)
+		{
+			chars.add(word.charAt(i));	
+		}
+		for (int i = 0; i < chars.size(); i++)
+		{
+			if(isPunctuation(chars.get(i)))
+				return true;
+		}
+		return false;
+	}
+	
+	//method that determines if a character is punctuation
+	//precondition: passes in a character c
+	//postcondition: returns true (if it's punctuation that I've defined) or false
+	public static boolean isPunctuation (char c)
+	{
+		char [] punctuation = {'.', ':', ';', '?', '!'};
+                for(char p:punctuation)
+                {
+                        if (Character.compare(c, p) == 0)
+                                return true;
+                }
+		return false;
+	}
 	//add method to determine the flesch index
 	
 	//add method to determine the flesch-kincaid index
