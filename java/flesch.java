@@ -2,6 +2,7 @@
 //Flesch program in Java
 import java.io.*;
 import java.util.*;
+import java.lang.Math;
 public class flesch
 {
 	public static void main(String[] args) throws IOException
@@ -15,10 +16,8 @@ public class flesch
 		ArrayList <String> words = new ArrayList <String>();
 		words = findWords(words,inputFile);
 	
-		int numSentences = countSentences(words);
-		int numWords = totalWords (words);
-		int totalSyll = totalSyllables(words);
-		System.out.println("Word Count: " + numWords + "\nSentence Count: " + numSentences + "\nNumber of Syllables: " + totalSyll);
+		int flesch = fleschIndex(words);
+		System.out.println("Flesch Readability Index: " + flesch);
 	}	
 
 	
@@ -173,7 +172,20 @@ public class flesch
 		return false;
 	}
 	//add method to determine the flesch index
-		
+	//precondition: pass in the arraylist of words
+	//postcondition: return the flesch readability index as an integer
+	public static int fleschIndex(ArrayList<String>words)	
+	{
+		int numSentences = countSentences(words);
+                int numWords = totalWords (words);
+                int totalSyll = totalSyllables(words);
+	
+		double a = ((double)totalSyll/(double)numWords);
+		double b = ((double)numWords/(double)numSentences);
+
+		return(int) (Math.round((206.835 - (a*84.6) - (b*1.015))*10)/10.0);
+	}
+	
 	//add method to determine the flesch-kincaid index
 	
 	//add method to determine the dale-chall index
