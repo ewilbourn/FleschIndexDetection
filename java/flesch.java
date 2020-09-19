@@ -17,7 +17,8 @@ public class flesch
 		words = findWords(words,inputFile);
 	
 		int flesch = fleschIndex(words);
-		System.out.println("Flesch Readability Index: " + flesch);
+		double flesch_kincaid = fleschKincaidIndex(words);
+		System.out.println("Flesch Readability Index: " + flesch + "\nFlesch-Kincaid Index: " + flesch_kincaid);
 	}	
 
 	
@@ -183,11 +184,23 @@ public class flesch
 		double a = ((double)totalSyll/(double)numWords);
 		double b = ((double)numWords/(double)numSentences);
 
-		return(int) (Math.round((206.835 - (a*84.6) - (b*1.015))*10)/10.0);
+		return (int)(Math.round((206.835 - (a*84.6) - (b*1.015))*10)/10.0);
 	}
 	
 	//add method to determine the flesch-kincaid index
+	public static double fleschKincaidIndex(ArrayList<String>words)
+	{
+		int numSentences = countSentences(words);
+                int numWords = totalWords (words);
+                int totalSyll = totalSyllables(words);
+		double a = ((double)totalSyll/(double)numWords);
+                double b = ((double)numWords/(double)numSentences);
+		
+		double index = (a*11.8) + (b*0.39) - 15.59;
+	        return (Math.round(index)*10)/10.0;
 	
+	}
+		
 	//add method to determine the dale-chall index
 } 
 
