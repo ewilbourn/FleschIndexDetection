@@ -17,7 +17,8 @@ public class flesch
 	
 		int numSentences = countSentences(words);
 		int numWords = totalWords (words);
-		System.out.println("Word Count: " + numWords + "\nSentence Count: " + numSentences);
+		int totalSyll = totalSyllables(words);
+		System.out.println("Word Count: " + numWords + "\nSentence Count: " + numSentences + "\nNumber of Syllables: " + totalSyll);
 	}	
 
 	
@@ -81,12 +82,25 @@ public class flesch
 	public static int numSyllables(String word)
 	{
 		int syllables = 0;
-		BitSet vowel_positions = new BitSet (word.length());
-		
+	//	BitSet vowel_positions = new BitSet (word.length());
+		char[] charArray = new char[word.length()];
+			
 		//loop that sets the bit in a BitSet to true when we have a vowel
 		for (int i = 0; i < word.length(); i++)
-			if (isVowel(word.charAt(i)))
-                  	      vowel_positions.set(i);
+			charArray[i] = word.charAt(i);
+		
+		for (int i = 0; i < charArray.length; i++)
+		{
+			if(!((i+1) == charArray.length && Character.toLowerCase(charArray[i]) == 'e'))
+			{
+				if(isVowel(charArray[i]))
+				{
+					syllables++;
+					if ((i+1)< word.length() && isVowel(charArray[i+1]))
+						i++;
+				}
+			}
+		}
 		return syllables;
 	}	
 
@@ -159,7 +173,7 @@ public class flesch
 		return false;
 	}
 	//add method to determine the flesch index
-	
+		
 	//add method to determine the flesch-kincaid index
 	
 	//add method to determine the dale-chall index
