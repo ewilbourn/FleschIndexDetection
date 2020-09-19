@@ -18,7 +18,8 @@ public class flesch
 	
 		int flesch = fleschIndex(words);
 		double flesch_kincaid = fleschKincaidIndex(words);
-		System.out.println("Flesch Readability Index: " + flesch + "\nFlesch-Kincaid Index: " + flesch_kincaid);
+		double dale_chall = daleChallIndex(words);
+		System.out.println("Flesch Readability Index: " + flesch + "\nFlesch-Kincaid Grade Level Index: " + flesch_kincaid + "\nDale-Chall Readability Score: " + dale_chall);
 	}	
 
 	
@@ -202,5 +203,70 @@ public class flesch
 	}
 		
 	//add method to determine the dale-chall index
+	public static double daleChallIndex(ArrayList<String> words)throws IOException
+	{
+		
+		int numSentences = countSentences(words);
+                int numWords = totalWords (words);
+                int difficultWords =  challengingWords(words);
+                double a = ((double)difficultWords/(double)numWords);
+                double b = ((double)numWords/(double)numSentences);
+		double index = ((a*100)*0.1579)+(b*0.0496);
+		if(a < 0.05)
+			index += 3.6365;
+		return (Math.round(index)*10)/10.0;
+	}
+
+	//method to perform a binary search
+	//precondition: pass in the arraylist of strings and the string key we're looking for
+	//postcondition: return the location of the key in the arraylist; if the key isn't found, then return -1
+	private static int binarySearch (ArrayList <String> wordList, String key)
+	{
+		int first = 0, last = (wordList.size()-1), middle, location;
+		boolean found = false;
+
+		do
+		{
+			middle = (first + last) / 2;
+			if (key.equals(wordList.get(middle)))
+				found = true;
+			else if (key.compareTo(wordList.get(middle))<0)
+				last = middle - 1;
+
+			else
+				first = middle + 1;
+		}while ((! found) && (first <= last));
+
+		location = middle;
+
+		return (found ? location : -1);
+	}
+	
+	//method to count the number of words in a text file that are considered difficult
+	//precondition: pass in the arraylist of words from the text file we're reading in
+	//postcondition: return the integer with the number of difficult words in the text file
+	private static int challengingWords(ArrayList <String> words)throws IOException
+	{
+		int difficultWords = 0;
+		ArrayList <String> wordList = createDaleChallList();
+		for (int i = 0; i < words.size(); i++)
+		{
+			int found = binarySearch(wordList, words.get(i));
+			if (found != -1)
+				difficultWords++;
+		}	
+		return difficultWords;
+		
+	}
+
+	//method to create an ArrayList of Strings for the DaleChallList
+	//precondition: takes in no arguments
+	//postcondition: returns the arraylist of strings that holds all the words from the dale chall list	
+	private static ArrayList<String> createDaleChallList() throws IOException
+	{
+		ArrayList<String> daleChall = new ArrayList<String>();
+		daleChall = findWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+		return daleChall;
+	}
 } 
 
