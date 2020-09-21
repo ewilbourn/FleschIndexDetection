@@ -3,10 +3,15 @@
 #include <deque>
 #include <stdio.h>
 #include <ctype.h>
-
+#include <string.h>
+#include <cstring>
 using namespace std;
 void getWords(deque<string> &words, string input);
 bool isNumber(string str);
+bool findSentence (String word)
+bool isPunctuation (char c)
+int countSentences(deque<string> words)
+
 
 int main ()
 {
@@ -19,6 +24,9 @@ int main ()
 	getWords(words, input);
 	for (int i = 1; i < words.size(); i++)
 		cout << words[i] << endl;
+
+	int num = countSentences(words);
+	cout << "Number of sentences: " << num;
 	return 0;
 }
 void getWords(deque<string> &words, string input)
@@ -48,3 +56,38 @@ bool isNumber (string str)
 	//being stored in the string is a digit
 	return (counter == str.size() ? true : false);
 }
+
+bool findSentence (String word)
+{
+	for (int i = 0; i < word.size(); i++)
+	{
+		if(isPunctuation(word[i]))
+			return true;		
+	}
+	return false;
+}
+
+bool isPunctuation (char c)
+{
+	char [] punctuation = {'.', ':', ';', '?', '!'};
+        for(char p:punctuation)
+        {
+        	if (strcmp(c, p) == 0)
+                	return true;
+        }
+        
+	return false;
+}
+
+int countSentences(deque<string> words)
+{
+	int numSentences = 0;
+
+        for (int i = 0; i < words.size(); i++)
+        {
+        	if(findSentence(words[i]))
+                	numSentences += 1;
+        }
+        return numSentences;
+}
+
