@@ -83,10 +83,9 @@ public class flesch
 	public static int numSyllables(String word)
 	{
 		int syllables = 0;
-	//	BitSet vowel_positions = new BitSet (word.length());
 		char[] charArray = new char[word.length()];
 			
-		//loop that sets the bit in a BitSet to true when we have a vowel
+		//loop that sets the position in a char array to true when we have a vowel
 		for (int i = 0; i < word.length(); i++)
 			charArray[i] = word.charAt(i);
 		
