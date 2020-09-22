@@ -11,6 +11,9 @@ bool findSentence (string word);
 bool isPunctuation (char c);
 int countSentences(vector<string> words);
 int totalWords(vector<string>words);
+bool isVowel(char c);
+int numSyllables (string word);
+int totalSyllables(vector <string> words);
 
 int main ()
 {
@@ -24,9 +27,14 @@ int main ()
 	getWords(words, input);
 	int num = countSentences(words);
 	int totWords = totalWords(words);
-	cout << "Sentences: " << num << "\nWords : " << totWords;
+	int syll = totalSyllables(words);
+	cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll;
 	return 0;
 }
+
+//method to add all the words to a vector
+//precondition: pass in the empty vector that we're filling and the name of the file we're opening
+//postcondition: nothing is returned, but the vectors is updated
 void getWords(vector<string> &words, string input)
 {
     ifstream file;
@@ -41,6 +49,9 @@ void getWords(vector<string> &words, string input)
     }
 }
 
+//method to determine if a string is holding a number
+//precondition: pass in the string
+//postcondition: return true if we have a number, false if we don't (boolean)
 bool isNumber (string str)
 {
 	int counter = 0;
@@ -55,6 +66,9 @@ bool isNumber (string str)
 	return (counter == str.size() ? true : false);
 }
 
+//method that determines if we have a sentence
+//precondition: pass in a string
+//postcondition: return true if there is punctuation in the string, false if there is not(boolean)
 bool findSentence (string word)
 {
 	for (int i = 0; i < word.size(); i++)
@@ -65,6 +79,9 @@ bool findSentence (string word)
 	return false;
 }
 
+//method that determines if a char is punctuation or not
+//precondition: pass in the character
+//postcondition: return true if the character is punctuation, false if it isn't (boolean)
 bool isPunctuation (char c)
 {
 	char punctuation[] = {'.', ':', ';', '?', '!'};
@@ -75,7 +92,9 @@ bool isPunctuation (char c)
 	return false;
 }
 
-
+//method to count the number of sentences in a text file
+//precondition: pass in the vector of words (strings)
+//postcondition: return the total number of sentences in the file (integer)
 int countSentences(vector<string> words)
 {
 	int numSentences = 0;
@@ -88,8 +107,65 @@ int countSentences(vector<string> words)
         return numSentences;
 }
 
+//method to return the total number of words in a text file
+//precondition: pass in the vector of words (strings)
+//postcondition: return the number of words in the text file (integer)
 int totalWords(vector<string> words)
 {
 	//need the minus 1 because for some reason the first value in the vector is a space
 	return words.size()-1;
 }
+
+//method to determine if a character is a vowel
+//precondition: pass in a letter (char)
+//postcondition: return true if the letter is a vowel, false if it is not (boolean)
+bool isVowel(char c)
+{
+	char vowels[] = {'a', 'e', 'i', 'o', 'u','y'};
+        for(char vowel:vowels)
+        {
+        	if (tolower(c) == vowel)
+                	return true;
+        }
+
+        return false;
+}
+
+//method to count the number of syllables in the a word
+//precondition: pass in the word (string)
+//postcondition: return the number of syllables (integer)
+int numSyllables(string word)
+{
+	int syllables = 0;
+
+        for (int i = 0; i < word.length(); i++)
+        {
+		//this handles when the word ends in an e (which is silent, and thus not a syllable)
+        	if(!((i+1) == word.length() && tolower(word[i]) == 'e'))
+                {
+                	if(isVowel(word[i]))
+                        {
+                        	syllables++;
+				//handles two vowels in a row
+				//i.e. spool, cool, moon
+                                if ((i+1)< word.length() && isVowel(word[i+1]))
+                                	i++;
+                        }
+              	}
+       	}
+        return syllables;
+}
+
+//method to count the total number of syllables in a text file
+//precondition: pass in the vector of words (string)
+//postcondition: return the number of syllables in a file (integer)
+int totalSyllables(vector <string> words)
+{
+	int syllables = 0;
+        for(int i = 0; i < words.size(); i++)
+        {
+        	syllables += numSyllables(words[i]);
+        }
+        return syllables;
+}
+
