@@ -27,7 +27,10 @@ def findPunctuation(character):
 	if character in punctuation:
 		return True
 	return False
-		
+
+#function to count the number of sentences 
+#precondition: pass in the list of words (string)
+#postcondition: return the number of sentences in the file (integer)	
 def totalSentences(words):
 	numSentences = 0
 	for word in words:
