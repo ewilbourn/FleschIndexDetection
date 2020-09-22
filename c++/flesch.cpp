@@ -201,6 +201,7 @@ vector<string> createDaleChallList()
 {
 	vector<string> daleChall (1);
         getWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+ 	sort(daleChall.begin(), daleChall.end());
         return daleChall;
 }
 
