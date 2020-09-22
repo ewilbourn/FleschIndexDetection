@@ -1,15 +1,16 @@
 #include <iostream>
 #include <fstream>
-#include <deque>
+#include <vector>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 using namespace std;
-void getWords(deque<string> &words, string input);
+void getWords(vector<string> &words, string input);
 bool isNumber(string str);
 bool findSentence (string word);
 bool isPunctuation (char c);
-int countSentences(deque<string> words);
-
+int countSentences(vector<string> words);
+int totalWords(vector<string>words);
 
 int main ()
 {
@@ -17,17 +18,16 @@ int main ()
 	cout << "Enter the name of the input file: ";
 	cin >> input;
 
-	deque<string> words(1);
-
+	vector<string> words(1);
+	
+	
 	getWords(words, input);
-	for (int i = 1; i < words.size(); i++)
-		cout << words[i] << endl;
-
 	int num = countSentences(words);
-	cout << "Number of sentences: " << num;
+	int totWords = totalWords(words);
+	cout << "Sentences: " << num << "\nWords : " << totWords;
 	return 0;
 }
-void getWords(deque<string> &words, string input)
+void getWords(vector<string> &words, string input)
 {
     ifstream file;
     file.open (input);
@@ -68,7 +68,6 @@ bool findSentence (string word)
 bool isPunctuation (char c)
 {
 	char punctuation[] = {'.', ':', ';', '?', '!'};
-//        if (strcmp(c, ".") == 0 || strcmp(c, ":")==0||strcmp(c,";")==0||strcmp(c,"?")==0||strcmp(c,"!")==0)
 	for(char p: punctuation)
 		if(c==p) 
                 	return true;
@@ -76,7 +75,8 @@ bool isPunctuation (char c)
 	return false;
 }
 
-int countSentences(deque<string> words)
+
+int countSentences(vector<string> words)
 {
 	int numSentences = 0;
 
@@ -88,3 +88,8 @@ int countSentences(deque<string> words)
         return numSentences;
 }
 
+int totalWords(vector<string> words)
+{
+	//need the minus 1 because for some reason the first value in the vector is a space
+	return words.size()-1;
+}
