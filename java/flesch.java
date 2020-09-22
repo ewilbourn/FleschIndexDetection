@@ -15,7 +15,14 @@ public class flesch
 		String inputFile = in.nextLine();
 		ArrayList <String> words = new ArrayList <String>();
 		words = findWords(words,inputFile);
-	
+		ArrayList <String> hard = createDaleChallList();		
+		int numSent = countSentences(words);
+		int numSyll = totalSyllables(words);
+		int numWords = totalWords(words);
+		int hardWords = challengingWords(words);
+		int sizeDaleChall = hard.size();
+		System.out.println("Sentences: " + numSent + "\nSyllables: " + numSyll + "\nWords: " + numWords + "\nDifficult Words: " + hardWords);	
+		System.out.println("Size of Dale Chall List: " + sizeDaleChall);
 		int flesch = fleschIndex(words);
 		double flesch_kincaid = fleschKincaidIndex(words);
 		double dale_chall = daleChallIndex(words);
@@ -213,7 +220,7 @@ public class flesch
 		double index = ((a*100)*0.1579)+(b*0.0496);
 		if(a < 0.05)
 			index += 3.6365;
-		return (Math.round(index)*10)/10.0;
+		return (Math.round(index*10)/10.0);
 	}
 
 	//method to perform a binary search
@@ -265,6 +272,7 @@ public class flesch
 	{
 		ArrayList<String> daleChall = new ArrayList<String>();
 		daleChall = findWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+		Collections.sort(daleChall);
 		return daleChall;
 	}
 } 
