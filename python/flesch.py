@@ -12,6 +12,9 @@ def tokenizeFile(fileName):
 	return words;
 
 
+def totalWords(words):
+	return len(words)
+
 print("Enter the name of the input file: ")
 inputFile = input()
 
@@ -20,6 +23,9 @@ words = []
 
 #fill up the list with the words from the text file
 words = tokenizeFile(inputFile)
+numWords = totalWords(words)
+
+print("Number of Words: ", numWords)
 
 for w in words:
 	print(w)
