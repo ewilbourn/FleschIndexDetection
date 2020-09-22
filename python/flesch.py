@@ -28,7 +28,13 @@ def findPunctuation(character):
 		return True
 	return False
 		
-
+def totalSentences(words):
+	numSentences = 0
+	for word in words:
+		for char in word:
+			if(findPunctuation(char)):
+				numSentences+=1
+	return numSentences
 #####################################################################################
 print("Enter the name of the input file: ")
 inputFile = input()
@@ -39,8 +45,10 @@ words = []
 #fill up the list with the words from the text file
 words = tokenizeFile(inputFile)
 numWords = totalWords(words)
+numSentences = totalSentences(words)
 
 print("Number of Words: ", numWords)
+print("Number of Sentences: ", numSentences)
 
 for w in words:
 	print(w)
