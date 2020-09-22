@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <algorithm>
+#include <cmath>
 using namespace std;
 void getWords(vector<string> &words, string input);
 bool isNumber(string str);
@@ -14,7 +16,10 @@ int totalWords(vector<string>words);
 bool isVowel(char c);
 int numSyllables (string word);
 int totalSyllables(vector <string> words);
-
+vector <string> createDaleChallList();
+int challengingWords(vector <string> words);
+double fleschKincaidIndex(vector <string> words);
+int fleschIndex(vector<string>words);
 int main ()
 {
 	string input;
@@ -28,7 +33,18 @@ int main ()
 	int num = countSentences(words);
 	int totWords = totalWords(words);
 	int syll = totalSyllables(words);
-	cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll;
+	int difficultWords = challengingWords(words);
+	cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
+	
+	vector <string> daleChall = createDaleChallList();
+	int sizeDale = daleChall.size()-1;
+	cout << "\nSize of Dale Chall: " << sizeDale;
+
+	int flesch = fleschIndex(words);
+        double flesch_kincaid = fleschKincaidIndex(words);
+        //double dale_chall = daleChallIndex(words);
+        cout << "Flesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: " << flesch_kincaid/* + "\nDale-Chall Readability Score: " + dale_chall*/;
+                
 	return 0;
 }
 
@@ -167,5 +183,55 @@ int totalSyllables(vector <string> words)
         	syllables += numSyllables(words[i]);
         }
         return syllables;
+}
+
+//method to create a vector of the words found in the Dale-Chall list
+//precondition: pass nothing in
+//postcondition: return the vector of words (string)
+vector<string> createDaleChallList() 
+{
+	vector<string> daleChall (1);
+        getWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+        return daleChall;
+}
+
+//method to count the number of challenging words in a text file
+//precondition: pass in the vector of words (string) that make up the file
+//postcondition: return the number of challenging words in the file (integer)
+int challengingWords(vector <string> words)
+{
+	int difficultWords = 0;
+        vector <string> wordList = createDaleChallList();
+        for (int i = 0; i < words.size(); i++)
+        {
+        	bool found = binary_search(wordList.begin(), wordList.end(), words[i]);
+                if (found != false)
+                	difficultWords++;
+        }
+        return difficultWords;
+}
+
+double fleschKincaidIndex(vector<string>words)
+{
+	int numSentences = countSentences(words);
+        int numWords = totalWords (words);
+        int totalSyll = totalSyllables(words);
+        double a = ((double)totalSyll/(double)numWords);
+        double b = ((double)numWords/(double)numSentences);
+
+        double index = (a*11.8) + (b*0.39) - 15.59;
+        return (round(index)*10)/10.0;
+}
+
+int fleschIndex(vector<string>words)
+{
+	int numSentences = countSentences(words);
+        int numWords = totalWords (words);
+        int totalSyll = totalSyllables(words);
+
+        double a = ((double)totalSyll/(double)numWords);
+        double b = ((double)numWords/(double)numSentences);
+
+        return round((206.835 - (a*84.6) - (b*1.015)));
 }
 
