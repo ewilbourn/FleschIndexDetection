@@ -3,16 +3,14 @@
 
 #function to fill a list with all the words from a text file
 def tokenizeFile(fileName):
-    words = []
-    with open(fileName,'r') as file: 
-        #reading each line     
-        for line in file: 
-      	    #reading each word         
-      	    for word in line.split(): 
-                #if the word isn't a digit, add it to the list           
-                if(not word.isdigit()):
-	  	    words.append(word)
-    return words;
+	words = []
+	with open(fileName,'r') as file: 
+		for line in file: 
+			for word in line.split(): 
+				if(not word.isdigit()):
+					words.append(word) #if the word isn't a digit, add it to the list           
+	return words;
+
 
 print("Enter the name of the input file: ")
 inputFile = input()
@@ -23,4 +21,5 @@ words = []
 #fill up the list with the words from the text file
 words = tokenizeFile(inputFile)
 
-
+for w in words:
+	print(w)
