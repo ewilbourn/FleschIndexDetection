@@ -23,6 +23,8 @@ int challengingWords(vector <string> words);
 double fleschKincaidIndex(vector <string> words);
 int fleschIndex(vector<string>words);
 double daleChallIndex(vector<string> words);
+string deletePunctuation(string &word);
+void deleteAllPunct(vector<string>&words);
 
 int main ()
 {
@@ -34,25 +36,19 @@ int main ()
 	
 	
 	getWords(words, input);
-	//int num = countSentences(words);
-	//int totWords = totalWords(words);
-	//int syll = totalSyllables(words);
-	//int difficultWords = challengingWords(words);
-	//cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
+	int num = countSentences(words);
+	int totWords = totalWords(words);
+	int syll = totalSyllables(words);
+	int difficultWords = challengingWords(words);
+	cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
 	
-	//vector <string> daleChall = createDaleChallList();
-	//int sizeDale = daleChall.size()-1;
-	//cout << "\nSize of Dale Chall: " << sizeDale;
-
 	int flesch = fleschIndex(words);
         double flesch_kincaid = fleschKincaidIndex(words);
         double dale_chall = daleChallIndex(words);
-        cout << "Flesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
-	cout << fixed;
-	cout << setprecision(1) << flesch_kincaid;
-	cout << "\nDale-Chall Readability Score: ";
-	cout << fixed;
-	cout << setprecision(1) << dale_chall << endl;
+        cout << "\nFlesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
+	cout << fixed << setprecision(1);
+	cout << flesch_kincaid;
+	cout << "\nDale-Chall Readability Score: " << dale_chall;
                 
 	return 0;
 }
@@ -128,10 +124,33 @@ int countSentences(vector<string> words)
         {
         	if(findSentence(words[i]))
                 	numSentences += 1;
+				
         }
         return numSentences;
 }
 
+//method to delete punctuation from a word (string) so the dale chall count of challenging words will be accurate
+//precondition: pass in the vector of words (string)
+//postcondition: return nothing, but the vector of words is modified
+string deletePunctuation(string &word)
+{
+	for (int i = 0; i < word.size(); i++)
+	{
+		 //if the character at index i in the word (string) is punctuation,
+		 //then erase the character (starting at index i, length 1)
+		 if(isPunctuation(word[i]))
+			word.erase(word.begin()+i);			
+	}
+	return word;
+}
+
+void deleteAllPunct(vector<string>&words)
+{
+	for (int i = 0; i < words.size(); i++)
+	{
+		words[i] = deletePunctuation(words[i]);
+	}
+}
 //method to return the total number of words in a text file
 //precondition: pass in the vector of words (strings)
 //postcondition: return the number of words in the text file (integer)
@@ -156,6 +175,7 @@ bool isVowel(char c)
         return false;
 }
 
+
 //method to count the number of syllables in the a word
 //precondition: pass in the word (string)
 //postcondition: return the number of syllables (integer)
@@ -175,7 +195,7 @@ int numSyllables(string word)
 				//i.e. spool, cool, moon
                                 if ((i+1)< word.length() && isVowel(word[i+1]))
                                 	i++;
-                        }
+		       }
               	}
        	}
         return syllables;
@@ -230,7 +250,6 @@ double fleschKincaidIndex(vector<string>words)
         double b = ((double)numWords/(double)numSentences);
 
         double index = (a*11.8) + (b*0.39) - 15.59;
-        //return (round(index)*10)/10.0;
 	return index;
 }
 
@@ -256,7 +275,6 @@ double daleChallIndex(vector<string> words)
         double index = ((a*100)*0.1579)+(b*0.0496);
         if(a < 0.05)
         	index += 3.6365;
-//        return (Math.round(index)*10)/10.0;
-	return index;
+        return round(index*10)/10;
 }
 
