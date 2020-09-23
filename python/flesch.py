@@ -1,5 +1,6 @@
 #Emily Wilbourn
 #Python flesch program
+from bisect import bisect_left
 
 #function to fill a list with all the words from a text file
 #precondition: pass in the file name (string)
@@ -8,17 +9,12 @@ def tokenizeFile(fileName):
 	words = []
 	with open(fileName,'r') as file: 
 		for line in file: 
-			for word in line.split(): 
-				if(not word.isdigit()):
-					words.append(word) #if the word isn't a digit, add it to the list           
+			for word in line.split():
+				if (not word.isdigit()):
+					words.append(word)
 	return words;
 
-#function to count the number of words in a file
-#precondition: pass in the list of words
-#postcondition: return the length of the list of words (integer)
-def totalWords(words):
-	return len(words)
-
+	
 #function to determine if a word has punctuation
 #precondition: pass in the word being stored in a list of strings
 #postcondition: return True if there is punctuat
@@ -35,15 +31,15 @@ def totalSentences(words):
 	numSentences = 0
 	for word in words:
 		for char in word:
-			if(findPunctuation(char)):
-				numSentences+=1
+			 if(findPunctuation(char)):
+			 	numSentences +=1 
 	return numSentences
 
 #function to determine if a character is a vowel
 #precondition: pass in a character
 #postcondition: return True is the character is a vowel, False if it isn't
 def findVowel(character):
-	vowels = {'a', 'e', 'i', 'o', 'u', 'y'}
+	vowels = "aeiouy"
 	if character in vowels:
 		return True
 	return False
@@ -79,9 +75,23 @@ def totalSyllables(words):
 #precondition: pass in nothing
 #postcondition: return the list of words (strings)
 def createDaleChallList():
-        daleChall = []
-        daleChall = tokenizeFile("/pub/pounds/CSC330/dalechall/wordlist1995.txt")
-        return daleChall;
+	daleChall = []
+	daleChall = tokenizeFile("/pub/pounds/CSC330/dalechall/wordlist1995.txt")
+	daleChall.sort()
+	return daleChall
+
+#function to quickly find values in list
+#precondition: pass in the list of words (string) and the key we're looking for (string)
+#postcondition: return the location of the key in list; if key isn't in list, return -1
+def binarySearch(wordList,key):
+	low = 0
+	high = len(wordList)-1
+	while low <= high: 
+		mid = (low+high)//2
+		if wordList[mid] > key: high = mid-1
+		elif wordList[mid] < key: low = mid+1
+		else: return mid
+	return -1
 
 #function to count the number of challenging words in a text file based on the Dale Chall List
 #precondition: pass in the list of words (strings)
@@ -91,30 +101,90 @@ def countChallengingWords(words):
 	daleChall = []
 	daleChall = createDaleChallList()
 	for word in words:
-		 if word in daleChall:
+		 if (binarySearch(daleChall,word) != -1):
 			 difficultWords+=1
 	return difficultWords
 
+#function to calculate the flesch-kincaid readability index
+#precondition: pass in the list of words (string)
+#postcondition: returns the flesch-kincaid readability index (float to 1 decimal place)
+def fleschKincaidIndex(words):
+	numSentences = totalSentences(words)
+	numWords = len(words)
+	totalSyll = totalSyllables(words)
+
+	#these are floats
+	a = totalSyll/numWords
+	b = numWords/numSentences
+
+	#index is a float
+	index = (a*11.8) + (b*0.39) - 15.59
+
+	#return the index (float) rounded to 1 decimal place
+	return round(index, 1)
+
+
+#function to calculate the flesch readability index
+#precondition: pass in the list of words (string)
+#postcondition: returns the flesch index (integer)
+def fleschIndex(words):
+        numSentences = totalSentences(words)
+        numWords = len(words)
+        totalSyll = totalSyllables(words)
+
+	#these are floats
+        a = totalSyll/numWords
+        b = numWords/numSentences
+
+	#return the index (float) rounded to 1 decimal place
+        return round((206.835 - (a*84.6) - (b*1.015)),1)
+
+#function to calculate the Dale-Chall Index
+#precondition: pass in the list of words (string)
+#postcondition: returns the Dale-Chall Index (float rounded to 1 decimal place)
+def daleChallIndex(words):
+	numSentences = totalSentences(words)
+	numWords = len(words)
+	difficultWords =  countChallengingWords(words)
+
+	#these are floats
+	a = difficultWords/numWords
+	b = numWords/numSentences
+	index = ((a*100)*0.1579)+(b*0.0496)
+	if(a < 0.05):
+		index += 3.6365;
+
+	#return the index (float) rounded to 1 decimal place
+	return round(index, 1);
+
+
+
 #####################################################################################
-print("Enter the name of the input file: ")
-inputFile = input()
 
-#instantiate a list
-words = []
+def main():
+	print("Enter the name of the input file: ")
+	inputFile = input()
 
-#fill up the list with the words from the text file
-words = tokenizeFile(inputFile)
-numWords = totalWords(words)
-numSentences = totalSentences(words)
-numSyllables = totalSyllables(words)
-numChallWords = countChallengingWords(words)
+	#instantiate a list
+	words = []
 
-print("Number of Words: ", numWords)
-print("Number of Sentences: ", numSentences)
-print("Number of Syllables: ", numSyllables)
-print("Number of Challenging Words: ", numChallWords)
+	#fill up the list with the words from the text file
+	words = tokenizeFile(inputFile)
+	numWords = len(words)
+	numSentences = totalSentences(words)
+	numSyllables = totalSyllables(words)
+	numChallWords = countChallengingWords(words)
+	daleChall = daleChallIndex(words)
+	flesch = fleschIndex(words)
+	fleschKincaid = fleschKincaidIndex(words)
 
-for w in words:
-	print(w)
+	print("Number of Words: ", numWords)
+	print("Number of Sentences: ", numSentences)
+	print("Number of Syllables: ", numSyllables)
+	print("Number of Challenging Words: ", numChallWords)
+	print("Flesch Index: ", flesch)
+	print("Flesch-Kincaid Index: ", fleschKincaid)
+	print("Dale Chall Index: ", daleChall)
+#################################################################################
 
-
+main()
