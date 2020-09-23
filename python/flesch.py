@@ -8,11 +8,11 @@ from bisect import bisect_left
 def tokenizeFile(fileName):
 	words = []
 	with open(fileName,'r') as file: 
-		for line in file: 
+		for line in file:
 			for word in line.split():
 				if (not word.isdigit()):
 					words.append(word)
-	return words;
+	return words
 
 	
 #function to determine if a word has punctuation
