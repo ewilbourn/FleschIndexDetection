@@ -7,7 +7,7 @@ from bisect import bisect_left
 #postcondition: returns the list of words
 def tokenizeFile(fileName):
 	words = []
-	with open(fileName,'r') as file: 
+	with open(fileName,encoding='utf8',errors='ignore') as file: 
 		for line in file:
 			for word in line.split():
 				if (not word.isdigit()):
