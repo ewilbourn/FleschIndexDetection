@@ -11,13 +11,8 @@ program reader
    end subroutine read_file
  end interface
 
- print *, "Enter enter file:" 
- !read *, input_string
  call get_command_argument(1,input_string)
- print *, "File"
- print *, input_string
  call read_file( long_string, input_string, filesize )
- !print *, long_string
  print *, "Read ", filesize, " characters."
 end program reader
 
