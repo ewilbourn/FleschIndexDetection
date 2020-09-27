@@ -159,6 +159,8 @@ int numSyllables(string word)
 		       }
               	}
        	}
+	if(syllables == 0)
+		syllables = 1;
         return syllables;
 }
 
