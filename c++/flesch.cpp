@@ -9,22 +9,18 @@
 #include <iomanip>
 
 using namespace std;
-void getWords(vector<string> &words, string input);
+void getWords(vector<string> &words, string input, int &numSentences);
 bool isNumber(string str);
-bool findSentence (string word);
-bool isPunctuation (char c);
-int countSentences(vector<string> words);
 int totalWords(vector<string>words);
 bool isVowel(char c);
+bool isPunctuation (char c);
 int numSyllables (string word);
 int totalSyllables(vector <string> words);
 vector <string> createDaleChallList();
 int challengingWords(vector <string> words);
-double fleschKincaidIndex(vector <string> words);
-int fleschIndex(vector<string>words);
-double daleChallIndex(vector<string> words);
-string deletePunctuation(string &word);
-void deleteAllPunct(vector<string>&words);
+double fleschKincaidIndex(vector <string> words, int numSentences);
+int fleschIndex(vector<string>words, int numSentences);
+double daleChallIndex(vector<string> words, int numSentences);
 
 int main ()
 {
@@ -34,17 +30,17 @@ int main ()
 
 	vector<string> words(1);
 	
-	
-	getWords(words, input);
-	int num = countSentences(words);
+	int numSentences = 0;
+	getWords(words, input, numSentences);
+
 	int totWords = totalWords(words);
 	int syll = totalSyllables(words);
 	int difficultWords = challengingWords(words);
-	cout << "Sentences: " << num << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
+	cout << "Sentences: " << numSentences << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
 	
-	int flesch = fleschIndex(words);
-        double flesch_kincaid = fleschKincaidIndex(words);
-        double dale_chall = daleChallIndex(words);
+	int flesch = fleschIndex(words, numSentences);
+        double flesch_kincaid = fleschKincaidIndex(words, numSentences);
+        double dale_chall = daleChallIndex(words, numSentences);
         cout << "\nFlesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
 	cout << fixed << setprecision(1);
 	cout << flesch_kincaid;
@@ -56,7 +52,7 @@ int main ()
 //method to add all the words to a vector
 //precondition: pass in the empty vector that we're filling and the name of the file we're opening
 //postcondition: nothing is returned, but the vectors is updated
-void getWords(vector<string> &words, string input)
+void getWords(vector<string> &words, string input, int &numSentences)
 {
     ifstream file;
     file.open (input);
@@ -65,9 +61,38 @@ void getWords(vector<string> &words, string input)
     string word;
     while (file >> word)
     {
+	//for loop to count the number of sentences
+	for (int i = 0; i < word.size(); i++)
+        {
+                if(isPunctuation(word[i]))
+                {			
+			numSentences+=1;
+		}
+        }
+
+	//for loop to remove punctuation from words before adding them to the vector
+	string punctuation = ".:;!?";
+	for (char c: punctuation) 
+	{
+		word.erase(std::remove(word.begin(), word.end(), c), word.end());
+	}
+
+
  	if(!isNumber(word))
 	       words.push_back(word);
     }
+}
+
+//method that determines if a char is punctuation or not
+//precondition: pass in the character
+//postcondition: return true if the character is punctuation, false if it isn't (boolean)
+bool isPunctuation (char c)
+{
+	char punctuation[] = {'.', ':', ';', '?', '!'};
+	for(char p: punctuation)
+		if(c==p) 
+			return true;
+	return false;
 }
 
 //method to determine if a string is holding a number
@@ -87,70 +112,6 @@ bool isNumber (string str)
 	return (counter == str.size() ? true : false);
 }
 
-//method that determines if we have a sentence
-//precondition: pass in a string
-//postcondition: return true if there is punctuation in the string, false if there is not(boolean)
-bool findSentence (string word)
-{
-	for (int i = 0; i < word.size(); i++)
-	{
-		if(isPunctuation(word[i]))	
-			return true;		
-	}
-	return false;
-}
-
-//method that determines if a char is punctuation or not
-//precondition: pass in the character
-//postcondition: return true if the character is punctuation, false if it isn't (boolean)
-bool isPunctuation (char c)
-{
-	char punctuation[] = {'.', ':', ';', '?', '!'};
-	for(char p: punctuation)
-		if(c==p) 
-                	return true;
-        
-	return false;
-}
-
-//method to count the number of sentences in a text file
-//precondition: pass in the vector of words (strings)
-//postcondition: return the total number of sentences in the file (integer)
-int countSentences(vector<string> words)
-{
-	int numSentences = 0;
-
-        for (int i = 0; i < words.size(); i++)
-        {
-        	if(findSentence(words[i]))
-                	numSentences += 1;
-				
-        }
-        return numSentences;
-}
-
-//method to delete punctuation from a word (string) so the dale chall count of challenging words will be accurate
-//precondition: pass in the vector of words (string)
-//postcondition: return nothing, but the vector of words is modified
-string deletePunctuation(string &word)
-{
-	for (int i = 0; i < word.size(); i++)
-	{
-		 //if the character at index i in the word (string) is punctuation,
-		 //then erase the character (starting at index i, length 1)
-		 if(isPunctuation(word[i]))
-			word.erase(word.begin()+i);			
-	}
-	return word;
-}
-
-void deleteAllPunct(vector<string>&words)
-{
-	for (int i = 0; i < words.size(); i++)
-	{
-		words[i] = deletePunctuation(words[i]);
-	}
-}
 //method to return the total number of words in a text file
 //precondition: pass in the vector of words (strings)
 //postcondition: return the number of words in the text file (integer)
@@ -220,7 +181,15 @@ int totalSyllables(vector <string> words)
 vector<string> createDaleChallList() 
 {
 	vector<string> daleChall (1);
-        getWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+ 	ifstream file;
+        file.open ("/pub/pounds/CSC330/dalechall/wordlist1995.txt");
+
+        string word;
+        while (file >> word)
+        {
+		daleChall.push_back(word);	
+	}
+
  	sort(daleChall.begin(), daleChall.end());
         return daleChall;
 }
@@ -241,9 +210,9 @@ int challengingWords(vector <string> words)
         return difficultWords;
 }
 
-double fleschKincaidIndex(vector<string>words)
+double fleschKincaidIndex(vector<string>words, int numSentences)
 {
-	int numSentences = countSentences(words);
+//	int numSentences = countSentences(words);
         int numWords = totalWords (words);
         int totalSyll = totalSyllables(words);
         double a = ((double)totalSyll/(double)numWords);
@@ -253,9 +222,9 @@ double fleschKincaidIndex(vector<string>words)
 	return index;
 }
 
-int fleschIndex(vector<string>words)
+int fleschIndex(vector<string>words, int numSentences)
 {
-	int numSentences = countSentences(words);
+//	int numSentences = countSentences(words);
         int numWords = totalWords (words);
         int totalSyll = totalSyllables(words);
 
@@ -265,9 +234,9 @@ int fleschIndex(vector<string>words)
         return round((206.835 - (a*84.6) - (b*1.015)));
 }
 
-double daleChallIndex(vector<string> words)
+double daleChallIndex(vector<string> words, int numSentences)
 {
-	int numSentences = countSentences(words);
+//	int numSentences = countSentences(words);
         int numWords = totalWords (words);
         int difficultWords =  challengingWords(words);
         double a = ((double)difficultWords/(double)numWords);
