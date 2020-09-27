@@ -33,13 +33,9 @@ int main ()
 	int numSentences = 0;
 	int totalWords = 0;
 	getWords(words, input, numSentences, totalWords);
-	
-//	for (int i = 0; i < words.size(); i++)
-//		cout << words.at(i)<<endl;
-//	int totWords = totalWords(words);
 	int syll = totalSyllables(words);
 	int hardWords = difficultWords(words);
-	cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
+	//cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
 	
 	int flesch = fleschIndex(words, numSentences, totalWords);
         double flesch_kincaid = fleschKincaidIndex(words, numSentences, totalWords);
@@ -198,7 +194,7 @@ vector<string> createDaleChallList()
         return daleChall;
 }
 
-//method to count the number of easy words in a text file
+//method to count the number of challenging words in a text file
 //precondition: pass in the vector of words (string) that make up the file
 //postcondition: return the number of challenging words in the file (integer)
 int difficultWords(vector <string> words)
@@ -208,7 +204,8 @@ int difficultWords(vector <string> words)
         for (int i = 0; i < words.size(); i++)
         {
         	bool found = binary_search(wordList.begin(), wordList.end(), words[i]);
-                if (!found)
+                //if a word isn't found on the easy word list (Dale-Chall list), increment our difficultWords variable
+		if (!found)
                 {
 			difficultWords++;
         	}
