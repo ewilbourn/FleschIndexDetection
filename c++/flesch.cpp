@@ -9,7 +9,7 @@
 #include <iomanip>
 
 using namespace std;
-void getWords(vector<string> &words, string input, int &numSentences);
+void getWords(vector<string> &words, string input, int &numSentences, int &numWords);
 bool isNumber(string str);
 int totalWords(vector<string>words);
 bool isVowel(char c);
@@ -17,10 +17,10 @@ bool isPunctuation (char c);
 int numSyllables (string word);
 int totalSyllables(vector <string> words);
 vector <string> createDaleChallList();
-int challengingWords(vector <string> words);
-double fleschKincaidIndex(vector <string> words, int numSentences);
-int fleschIndex(vector<string>words, int numSentences);
-double daleChallIndex(vector<string> words, int numSentences);
+int difficultWords(vector <string> words);
+double fleschKincaidIndex(vector <string> words, int numSentences, int totalWords);
+int fleschIndex(vector<string>words, int numSentences, int totalWords);
+double daleChallIndex(vector<string> words,int numSentences, int totalWords);
 
 int main ()
 {
@@ -31,16 +31,19 @@ int main ()
 	vector<string> words(1);
 	
 	int numSentences = 0;
-	getWords(words, input, numSentences);
-
-	int totWords = totalWords(words);
-	int syll = totalSyllables(words);
-	int difficultWords = challengingWords(words);
-	cout << "Sentences: " << numSentences << "\nWords : " << totWords << "\nSyllables: " << syll << "\nDifficult Words: " << difficultWords;
+	int totalWords = 0;
+	getWords(words, input, numSentences, totalWords);
 	
-	int flesch = fleschIndex(words, numSentences);
-        double flesch_kincaid = fleschKincaidIndex(words, numSentences);
-        double dale_chall = daleChallIndex(words, numSentences);
+//	for (int i = 0; i < words.size(); i++)
+//		cout << words.at(i)<<endl;
+//	int totWords = totalWords(words);
+	int syll = totalSyllables(words);
+	int hardWords = difficultWords(words);
+	cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
+	
+	int flesch = fleschIndex(words, numSentences, totalWords);
+        double flesch_kincaid = fleschKincaidIndex(words, numSentences, totalWords);
+        double dale_chall = daleChallIndex(words, numSentences, totalWords);
         cout << "\nFlesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
 	cout << fixed << setprecision(1);
 	cout << flesch_kincaid;
@@ -52,7 +55,7 @@ int main ()
 //method to add all the words to a vector
 //precondition: pass in the empty vector that we're filling and the name of the file we're opening
 //postcondition: nothing is returned, but the vectors is updated
-void getWords(vector<string> &words, string input, int &numSentences)
+void getWords(vector<string> &words, string input, int &numSentences, int &numWords)
 {
     ifstream file;
     file.open (input);
@@ -71,7 +74,7 @@ void getWords(vector<string> &words, string input, int &numSentences)
         }
 
 	//for loop to remove punctuation from words before adding them to the vector
-	string punctuation = ".:;!?";
+	string punctuation = ".,:;!?";
 	for (char c: punctuation) 
 	{
 		word.erase(std::remove(word.begin(), word.end(), c), word.end());
@@ -79,9 +82,14 @@ void getWords(vector<string> &words, string input, int &numSentences)
 
 
  	if(!isNumber(word))
-	       words.push_back(word);
+	{
+		transform(word.begin(), word.end(), word.begin(), ::tolower); 	 
+		words.push_back(word);
+		numWords+=1;
+	}
     }
 }
+
 
 //method that determines if a char is punctuation or not
 //precondition: pass in the character
@@ -112,14 +120,6 @@ bool isNumber (string str)
 	return (counter == str.size() ? true : false);
 }
 
-//method to return the total number of words in a text file
-//precondition: pass in the vector of words (strings)
-//postcondition: return the number of words in the text file (integer)
-int totalWords(vector<string> words)
-{
-	//need the minus 1 because for some reason the first value in the vector is a space
-	return words.size()-1;
-}
 
 //method to determine if a character is a vowel
 //precondition: pass in a letter (char)
@@ -185,35 +185,37 @@ vector<string> createDaleChallList()
         file.open ("/pub/pounds/CSC330/dalechall/wordlist1995.txt");
 
         string word;
-        while (file >> word)
+        while (getline(file,word))
         {
+		transform(word.begin(), word.end(), word.begin(), ::tolower);
 		daleChall.push_back(word);	
 	}
 
  	sort(daleChall.begin(), daleChall.end());
+	
         return daleChall;
 }
 
-//method to count the number of challenging words in a text file
+//method to count the number of easy words in a text file
 //precondition: pass in the vector of words (string) that make up the file
 //postcondition: return the number of challenging words in the file (integer)
-int challengingWords(vector <string> words)
+int difficultWords(vector <string> words)
 {
 	int difficultWords = 0;
         vector <string> wordList = createDaleChallList();
         for (int i = 0; i < words.size(); i++)
         {
         	bool found = binary_search(wordList.begin(), wordList.end(), words[i]);
-                if (found != false)
-                	difficultWords++;
-        }
+                if (!found)
+                {
+			difficultWords++;
+        	}
+	}
         return difficultWords;
 }
 
-double fleschKincaidIndex(vector<string>words, int numSentences)
+double fleschKincaidIndex(vector<string>words, int numSentences, int numWords)
 {
-//	int numSentences = countSentences(words);
-        int numWords = totalWords (words);
         int totalSyll = totalSyllables(words);
         double a = ((double)totalSyll/(double)numWords);
         double b = ((double)numWords/(double)numSentences);
@@ -222,10 +224,8 @@ double fleschKincaidIndex(vector<string>words, int numSentences)
 	return index;
 }
 
-int fleschIndex(vector<string>words, int numSentences)
+int fleschIndex(vector<string>words, int numSentences, int numWords)
 {
-//	int numSentences = countSentences(words);
-        int numWords = totalWords (words);
         int totalSyll = totalSyllables(words);
 
         double a = ((double)totalSyll/(double)numWords);
@@ -234,12 +234,10 @@ int fleschIndex(vector<string>words, int numSentences)
         return round((206.835 - (a*84.6) - (b*1.015)));
 }
 
-double daleChallIndex(vector<string> words, int numSentences)
+double daleChallIndex(vector<string> words, int numSentences, int numWords)
 {
-//	int numSentences = countSentences(words);
-        int numWords = totalWords (words);
-        int difficultWords =  challengingWords(words);
-        double a = ((double)difficultWords/(double)numWords);
+   	int hardWords = difficultWords(words);
+	double a = ((double)hardWords/(double)numWords);
         double b = ((double)numWords/(double)numSentences);
         double index = ((a*100)*0.1579)+(b*0.0496);
         if(a < 0.05)
