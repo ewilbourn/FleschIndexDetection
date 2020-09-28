@@ -101,7 +101,7 @@ def countChallengingWords(words):
 	daleChall = []
 	daleChall = createDaleChallList()
 	for word in words:
-		 if (binarySearch(daleChall,word) != -1):
+		 if (binarySearch(daleChall,word) == -1):
 			 difficultWords+=1
 	return difficultWords
 
