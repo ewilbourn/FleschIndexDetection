@@ -2,9 +2,9 @@
 #Python flesch program
 from bisect import bisect_left
 
-#function to fill a list with all the words from a text file
-#precondition: pass in the file name (string)
-#postcondition: returns the list of words
+#function to fill a list with all the words from a text file amd return number of sentences
+#precondition: pass in the file name (string) and the list we want to update
+#postcondition: returns the number of sentences in a word and updates our list
 def tokenizeFile(words, fileName):
 	numSentences = 0
 	with open(fileName,encoding='utf8',errors='ignore') as file: 
@@ -14,7 +14,9 @@ def tokenizeFile(words, fileName):
 					for char in word:
 						if findPunctuation(char):
 							numSentences+=1
+							word = word.replace(char," ")
 					words.append(word.lower())
+					#print(word.lower())
 	return numSentences
 
 	
@@ -22,7 +24,7 @@ def tokenizeFile(words, fileName):
 #precondition: pass in the word being stored in a list of strings
 #postcondition: return True if there is punctuat
 def findPunctuation(character):
-	punctuation = {'.', ':', ';', '!', '?'}
+	punctuation = ".:;!?"
 	if character in punctuation:
 		return True
 	return False
@@ -107,8 +109,7 @@ def countChallengingWords(words):
 #function to calculate the flesch-kincaid readability index
 #precondition: pass in the list of words (string)
 #postcondition: returns the flesch-kincaid readability index (float to 1 decimal place)
-def fleschKincaidIndex(words):
-	numSentences = totalSentences(words)
+def fleschKincaidIndex(words, numSentences):
 	numWords = len(words)
 	totalSyll = totalSyllables(words)
 
@@ -126,8 +127,7 @@ def fleschKincaidIndex(words):
 #function to calculate the flesch readability index
 #precondition: pass in the list of words (string)
 #postcondition: returns the flesch index (integer)
-def fleschIndex(words):
-        numSentences = totalSentences(words)
+def fleschIndex(words, numSentences):
         numWords = len(words)
         totalSyll = totalSyllables(words)
 
@@ -136,13 +136,12 @@ def fleschIndex(words):
         b = numWords/numSentences
 
 	#return the index (float) rounded to 1 decimal place
-        return round((206.835 - (a*84.6) - (b*1.015)),1)
+        return round((206.835 - (a*84.6) - (b*1.015)))
 
 #function to calculate the Dale-Chall Index
 #precondition: pass in the list of words (string)
 #postcondition: returns the Dale-Chall Index (float rounded to 1 decimal place)
-def daleChallIndex(words):
-	numSentences = totalSentences(words)
+def daleChallIndex(words, numSentences):
 	numWords = len(words)
 	difficultWords =  countChallengingWords(words)
 
@@ -172,12 +171,12 @@ def main():
 	numWords = len(words)
 	numSyllables = totalSyllables(words)
 	numChallWords = countChallengingWords(words)
-	daleChall = daleChallIndex(words)
-	flesch = fleschIndex(words)
-	fleschKincaid = fleschKincaidIndex(words)
+	daleChall = daleChallIndex(words, numSentences)
+	flesch = fleschIndex(words, numSentences)
+	fleschKincaid = fleschKincaidIndex(words, numSentences)
 
-	print("Number of Words: ", numWords)
 	print("Number of Sentences: ", numSentences)
+	print("Number of Words: ", numWords)
 	print("Number of Syllables: ", numSyllables)
 	print("Number of Challenging Words: ", numChallWords)
 	print("Flesch Index: ", flesch)
