@@ -5,14 +5,17 @@ from bisect import bisect_left
 #function to fill a list with all the words from a text file
 #precondition: pass in the file name (string)
 #postcondition: returns the list of words
-def tokenizeFile(fileName):
-	words = []
+def tokenizeFile(words, fileName):
+	numSentences = 0
 	with open(fileName,encoding='utf8',errors='ignore') as file: 
 		for line in file:
 			for word in line.split():
 				if (not word.isdigit()):
-					words.append(word)
-	return words
+					for char in word:
+						if findPunctuation(char):
+							numSentences+=1
+					words.append(word.lower())
+	return numSentences
 
 	
 #function to determine if a word has punctuation
@@ -23,17 +26,6 @@ def findPunctuation(character):
 	if character in punctuation:
 		return True
 	return False
-
-#function to count the number of sentences 
-#precondition: pass in the list of words (string)
-#postcondition: return the number of sentences in the file (integer)	
-def totalSentences(words):
-	numSentences = 0
-	for word in words:
-		for char in word:
-			 if(findPunctuation(char)):
-			 	numSentences +=1 
-	return numSentences
 
 #function to determine if a character is a vowel
 #precondition: pass in a character
@@ -58,6 +50,8 @@ def findSyllables(word):
 				#i.e. spool, cool, moon
 				if ((i+1)< len(word) and findVowel(word[i+1])):
 					i+=1
+	if syllables == 0:
+		syllables = 1
 
 	return syllables
 
@@ -76,7 +70,12 @@ def totalSyllables(words):
 #postcondition: return the list of words (strings)
 def createDaleChallList():
 	daleChall = []
-	daleChall = tokenizeFile("/pub/pounds/CSC330/dalechall/wordlist1995.txt")
+	with open("/pub/pounds/CSC330/dalechall/wordlist1995.txt",encoding='utf8',errors='ignore') as file:
+                for line in file:
+                        for word in line.split():
+                        	daleChall.append(word.lower())
+
+
 	daleChall.sort()
 	return daleChall
 
@@ -169,9 +168,8 @@ def main():
 	words = []
 
 	#fill up the list with the words from the text file
-	words = tokenizeFile(inputFile)
+	numSentences = tokenizeFile(words,inputFile)
 	numWords = len(words)
-	numSentences = totalSentences(words)
 	numSyllables = totalSyllables(words)
 	numChallWords = countChallengingWords(words)
 	daleChall = daleChallIndex(words)
