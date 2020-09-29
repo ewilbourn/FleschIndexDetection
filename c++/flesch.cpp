@@ -35,7 +35,7 @@ int main ()
 	getWords(words, input, numSentences, totalWords);
 	int syll = totalSyllables(words);
 	int hardWords = difficultWords(words);
-	//cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
+	cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
 	
 	int flesch = fleschIndex(words, numSentences, totalWords);
         double flesch_kincaid = fleschKincaidIndex(words, numSentences, totalWords);
@@ -43,7 +43,7 @@ int main ()
         cout << "\nFlesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
 	cout << fixed << setprecision(1);
 	cout << flesch_kincaid;
-	cout << "\nDale-Chall Readability Score: " << dale_chall;
+	cout << "\nDale-Chall Readability Score: " << dale_chall << endl;
                 
 	return 0;
 }
@@ -70,7 +70,7 @@ void getWords(vector<string> &words, string input, int &numSentences, int &numWo
         }
 
 	//for loop to remove punctuation from words before adding them to the vector
-	string punctuation = ".,:;!?";
+	string punctuation = ".,:;!?[]";
 	for (char c: punctuation) 
 	{
 		word.erase(std::remove(word.begin(), word.end(), c), word.end());
