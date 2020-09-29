@@ -17,15 +17,21 @@ public class flesch
 		words = findWords(words,inputFile);
 		ArrayList <String> hard = createDaleChallList();		
 		int numSent = countSentences(words);
+
+		//initialize a new ArrayList<String> with the words that have the punctuation removed 
+		ArrayList<String> newWords = removePunctuation(words);
+	
+		//for (int i = 0; i < newWords.size(); i++)
+		//{		
+		//	System.out.println(newWords.get(i));
+		//}	
 		int numSyll = totalSyllables(words);
 		int numWords = totalWords(words);
-		int hardWords = challengingWords(words);
-		int sizeDaleChall = hard.size();
+		int hardWords = challengingWords(newWords);
 		System.out.println("Sentences: " + numSent + "\nSyllables: " + numSyll + "\nWords: " + numWords + "\nDifficult Words: " + hardWords);	
-		System.out.println("Size of Dale Chall List: " + sizeDaleChall);
 		int flesch = fleschIndex(words);
 		double flesch_kincaid = fleschKincaidIndex(words);
-		double dale_chall = daleChallIndex(words);
+		double dale_chall = daleChallIndex(words, newWords);
 		System.out.println("Flesch Readability Index: " + flesch + "\nFlesch-Kincaid Grade Level Index: " + flesch_kincaid + "\nDale-Chall Readability Score: " + dale_chall);
 	}	
 
@@ -46,11 +52,47 @@ public class flesch
 			String fileInput = sc.next();
 			//if the word, sc.next(), is not a number, add it to the ArrayList
 			if(!isNumber(fileInput))
-				words.add(fileInput);
+				words.add(fileInput.toLowerCase());
 		}	
 
 		sc.close();
 		return words;
+	}
+	
+	public static ArrayList<String> removePunctuation(ArrayList <String> words)
+	{
+		ArrayList<String> newWords = new ArrayList<String>();
+		for(int i = 0; i < words.size(); i++)
+                {
+			String word1 = words.get(i);
+                        String word = words.get(i);
+                	for (int j = 0; j < word.length(); j++)
+                	{
+                		if (isPunctuation(word.charAt(j)) || isOtherPunct(word.charAt(j)))
+				{	
+					String letter = Character.toString(word.charAt(j));
+					word1 = word.replace(letter, "");
+				}
+			}
+                	newWords.add(word1);
+                }
+		return newWords;
+
+	}
+
+
+	public static boolean isOtherPunct(char c)
+	{
+		char [] otherpunct = {'[', ']', '$', ','};
+		for(int i = 0; i < otherpunct.length; i++)
+		{
+			if (Character.compare(c, otherpunct[i]) == 0)
+				return true;
+			if((Character.toString(c)).equals("'"))
+				return true;
+		}
+		return false;
+
 	}
 	
 	//method to determine if a char is a vowel
@@ -92,10 +134,11 @@ public class flesch
 		int syllables = 0;
 		char[] charArray = new char[word.length()];
 			
-		//loop that sets the position in a char array to true when we have a vowel
+		//loop that add alls chars in a word to an array
 		for (int i = 0; i < word.length(); i++)
 			charArray[i] = word.charAt(i);
 		
+		//iterate through the chars in the array of letters
 		for (int i = 0; i < charArray.length; i++)
 		{
 			if(!((i+1) == charArray.length && Character.toLowerCase(charArray[i]) == 'e'))
@@ -108,6 +151,8 @@ public class flesch
 				}
 			}
 		}
+		if (syllables == 0)
+			syllables = 1;
 		return syllables;
 	}	
 
@@ -204,23 +249,24 @@ public class flesch
                 double b = ((double)numWords/(double)numSentences);
 		
 		double index = (a*11.8) + (b*0.39) - 15.59;
-	        return (Math.round(index)*10)/10.0;
-	
+	        return (Math.round(index*10)/10.0);
+		//return index;	
 	}
 		
 	//add method to determine the dale-chall index
-	public static double daleChallIndex(ArrayList<String> words)throws IOException
+	public static double daleChallIndex(ArrayList<String> words, ArrayList<String> newWords)throws IOException
 	{
 		
 		int numSentences = countSentences(words);
                 int numWords = totalWords (words);
-                int difficultWords =  challengingWords(words);
+                int difficultWords =  challengingWords(newWords);
                 double a = ((double)difficultWords/(double)numWords);
                 double b = ((double)numWords/(double)numSentences);
 		double index = ((a*100)*0.1579)+(b*0.0496);
 		if(a < 0.05)
 			index += 3.6365;
 		return (Math.round(index*10)/10.0);
+		//return index;
 	}
 
 	//method to perform a binary search
@@ -257,9 +303,15 @@ public class flesch
 		ArrayList <String> wordList = createDaleChallList();
 		for (int i = 0; i < words.size(); i++)
 		{
+			//perform a binary search to tell if a word is in the dale-chall list (list of easy words)
 			int found = binarySearch(wordList, words.get(i));
-			if (found != -1)
+			
+			//if the word is not found in the easy word list, increment the difficultWords variable
+			if (found == -1)
+			{
 				difficultWords++;
+			//	System.out.println(words.get(i) + " not found.");
+			}
 		}	
 		return difficultWords;
 		
@@ -272,8 +324,32 @@ public class flesch
 	{
 		ArrayList<String> daleChall = new ArrayList<String>();
 		daleChall = findWords(daleChall, "/pub/pounds/CSC330/dalechall/wordlist1995.txt");
-		Collections.sort(daleChall);
+	//	Collections.sort(daleChall);
+		selectionSort(daleChall);
 		return daleChall;
 	}
+
+	//method to sort a given ArrayList<String>
+	private static void selectionSort(ArrayList<String>words)
+	{
+		int minIndex;
+		String temp;
+
+		for (int i = 0; i < words.size(); i++)
+		{
+			minIndex = i;
+			for(int j = minIndex+1; j < words.size(); j++)
+				if(words.get(j).compareTo(words.get(minIndex)) < 0)
+					minIndex = j;
+			//swap algorithm
+			if (minIndex != i)
+			{	
+				temp = words.get(i);
+				words.set(i, words.get(minIndex));
+				words.set(minIndex, temp);
+			}		
+		}
+	}
+
 } 
 
