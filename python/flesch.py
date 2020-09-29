@@ -14,7 +14,9 @@ def tokenizeFile(words, fileName):
 					for char in word:
 						if findPunctuation(char):
 							numSentences+=1
-							word = word.replace(char," ")
+							word = word.replace(char,"")
+						if char in ",[]" or char == "'":
+							word = word.replace(char,"")
 					words.append(word.lower())
 					#print(word.lower())
 	return numSentences
@@ -43,15 +45,17 @@ def findVowel(character):
 #postcondition: return the number of syllables in a word (integer)
 def findSyllables(word):
 	syllables = 0
-	for i in range(len(word)):
+	for i in range(1, len(word)):
 	#this handles when the word ends in an e (which is silent, and thus not a syllable)
-		if(not ((i+1) == len(word) and (word[i]).lower() == 'e')):
-			if findVowel(word[i]):
+		if(not ((word[i]).lower() == 'e')):
+			#handles two vowels in a row
+			#i.e. spool, cool, moon
+			if ((i-1) > 0 and findVowel(word[i-1]) and findVowel(word[i])):					
 				syllables+=1
-				#handles two vowels in a row
-				#i.e. spool, cool, moon
-				if ((i+1)< len(word) and findVowel(word[i+1])):
-					i+=1
+				continue
+			if findVowel(word[i-1]):
+				syllables+=1
+				#print(word[i], " is a syllable in ", word)
 	if syllables == 0:
 		syllables = 1
 
@@ -73,11 +77,12 @@ def totalSyllables(words):
 def createDaleChallList():
 	daleChall = []
 	with open("/pub/pounds/CSC330/dalechall/wordlist1995.txt",encoding='utf8',errors='ignore') as file:
-                for line in file:
-                        for word in line.split():
-                        	daleChall.append(word.lower())
-
-
+		for line in file:
+			for word in line.split():
+				for char in word:
+					if char == "'":
+						word = word.replace("'","")
+				daleChall.append(word.lower())
 	daleChall.sort()
 	return daleChall
 
@@ -85,14 +90,19 @@ def createDaleChallList():
 #precondition: pass in the list of words (string) and the key we're looking for (string)
 #postcondition: return the location of the key in list; if key isn't in list, return -1
 def binarySearch(wordList,key):
-	low = 0
-	high = len(wordList)-1
-	while low <= high: 
-		mid = (low+high)//2
-		if wordList[mid] > key: high = mid-1
-		elif wordList[mid] < key: low = mid+1
-		else: return mid
-	return -1
+	first = 0
+	last = len(wordList)-1
+	found = False
+	while (first<=last and not found): 
+		mid = (first+last)//2
+		if wordList[mid] == key:
+			found = True
+		else:
+			if key < wordList[mid]:
+				last = mid - 1
+			else:
+				first = mid + 1
+	return found
 
 #function to count the number of challenging words in a text file based on the Dale Chall List
 #precondition: pass in the list of words (strings)
@@ -102,8 +112,8 @@ def countChallengingWords(words):
 	daleChall = []
 	daleChall = createDaleChallList()
 	for word in words:
-		 if (binarySearch(daleChall,word) == -1):
-			 difficultWords+=1
+		if (not binarySearch(daleChall,word)):
+			difficultWords+=1
 	return difficultWords
 
 #function to calculate the flesch-kincaid readability index
@@ -185,3 +195,4 @@ def main():
 #################################################################################
 
 main()
+
