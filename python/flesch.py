@@ -2,9 +2,9 @@
 #Python flesch program
 from bisect import bisect_left
 
-#function to fill a list with all the words from a text file amd return number of sentences
-#precondition: pass in the file name (string) and the list we want to update
-#postcondition: returns the number of sentences in a word and updates our list
+#function to fill a set with all the words from a text file amd return number of sentences
+#precondition: pass in the file name (string) and the set we want to update
+#postcondition: returns the number of sentences in a word and updates our set
 def tokenizeFile(words, fileName):
 	numSentences = 0
 	with open(fileName,encoding='utf8',errors='ignore') as file: 
@@ -45,17 +45,21 @@ def findVowel(character):
 #postcondition: return the number of syllables in a word (integer)
 def findSyllables(word):
 	syllables = 0
+	if findVowel(word[0]):
+		syllables+=1
+		#print(word[0], " is syllable in ", word)
 	for i in range(1, len(word)):
 	#this handles when the word ends in an e (which is silent, and thus not a syllable)
-		if(not ((word[i]).lower() == 'e')):
+		if(not ((word[i]).lower() == 'e' and i == (len(word)-1))):
+			if findVowel(word[i]) and not findVowel(word[i-1]):
+				syllables+=1
+				#print(word[i], " is syllable in ", word)
 			#handles two vowels in a row
 			#i.e. spool, cool, moon
-			if ((i-1) > 0 and findVowel(word[i-1]) and findVowel(word[i])):					
-				syllables+=1
-				continue
-			if findVowel(word[i-1]):
-				syllables+=1
-				#print(word[i], " is a syllable in ", word)
+			#if ((i-1) >= 0 and findVowel(word[i-1]) and findVowel(word[i])):					
+				#syllables+=1
+			#	continue
+				
 	if syllables == 0:
 		syllables = 1
 
@@ -73,7 +77,7 @@ def totalSyllables(words):
 
 #function to create a list of Dale Chall words
 #precondition: pass in nothing
-#postcondition: return the list of words (strings)
+#postcondition: return the set of words (strings)
 def createDaleChallList():
 	daleChall = []
 	with open("/pub/pounds/CSC330/dalechall/wordlist1995.txt",encoding='utf8',errors='ignore') as file:
@@ -105,19 +109,20 @@ def binarySearch(wordList,key):
 	return found
 
 #function to count the number of challenging words in a text file based on the Dale Chall List
-#precondition: pass in the list of words (strings)
+#precondition: pass in the set of words (strings)
 #postcondition: return the number of challenging words (integer)
 def countChallengingWords(words):
 	difficultWords = 0
 	daleChall = []
 	daleChall = createDaleChallList()
+	daleChall = set(daleChall)
 	for word in words:
-		if (not binarySearch(daleChall,word)):
+		if (word not in daleChall):
 			difficultWords+=1
 	return difficultWords
 
 #function to calculate the flesch-kincaid readability index
-#precondition: pass in the list of words (string)
+#precondition: pass in the set of words (string)
 #postcondition: returns the flesch-kincaid readability index (float to 1 decimal place)
 def fleschKincaidIndex(words, numSentences):
 	numWords = len(words)
@@ -173,7 +178,7 @@ def main():
 	print("Enter the name of the input file: ")
 	inputFile = input()
 
-	#instantiate a list
+	#instantiate a set
 	words = []
 
 	#fill up the list with the words from the text file
