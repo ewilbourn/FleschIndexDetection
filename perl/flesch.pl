@@ -19,16 +19,36 @@ my @all_words = ();
 #create a variable that will count the words
 my $word_count = 0;
 
+#create a variable that will count the sentences
+my $sentence_count = 0;
+
+#instantiate an array that holds all the punctuation
+my @punctuation = (".", ";", ":", "!", "?");
+
 #Now take each line and break it into tokens based on spaces and print the token
 foreach my $line (@all_lines)
 {
 	my @tokens = split(' ', $line);
 	foreach my $token (@tokens)
 	{
-		push(@all_words, $token) if(!looks_like_number($token));
+		#instantiating a character array where each index is a character
+		#in the word we are currently looking at
+		my @char_array = split(//, $token);
+
 
 		#increment the word counter variable
 		$word_count++ if(!looks_like_number($token));
+		for my $char(@char_array)
+		{
+			for my $punct (@punctuation)
+			{
+				$sentence_count++ if(($char cmp $punct) == 0);
+				$token =~ s/\Q$char// if (($char cmp $punct) == 0);
+			}
+		}
+		#if the token, aka the word, doesn't look like a number,
+		#then put it into the array of words
+		push(@all_words, $token) if(!looks_like_number($token));
 	}
 }
 
@@ -36,4 +56,10 @@ foreach my $line (@all_lines)
 print "@all_words\n";
 
 #print the word count
-print "Word Count: ", "$word_count";
+print "\nWord Count: ", "$word_count";
+
+
+#print the sentence count
+print "\nSentence Count: ", "$sentence_count";
+
+print"\n";
