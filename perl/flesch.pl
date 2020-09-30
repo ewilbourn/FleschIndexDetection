@@ -50,9 +50,12 @@ foreach my $line (@all_lines)
 				}
 			}
 		}
+		#make the token, aka the word, all lowercase
+		my $token1 = lc $token;
+
 		#if the token, aka the word, doesn't look like a number,
 		#then put it into the array of words
-		push(@all_words, $token) if(!looks_like_number($token));
+		push(@all_words, $token1) if(!looks_like_number($token));
 	}
 }
 
