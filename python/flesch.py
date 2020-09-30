@@ -47,7 +47,6 @@ def findSyllables(word):
 	syllables = 0
 	if findVowel(word[0]):
 		syllables+=1
-		#print(word[0], " is syllable in ", word)
 	for i in range(1, len(word)):
 	#this handles when the word ends in an e (which is silent, and thus not a syllable)
 		if(not ((word[i]).lower() == 'e' and i == (len(word)-1))):
