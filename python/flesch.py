@@ -51,14 +51,10 @@ def findSyllables(word):
 	for i in range(1, len(word)):
 	#this handles when the word ends in an e (which is silent, and thus not a syllable)
 		if(not ((word[i]).lower() == 'e' and i == (len(word)-1))):
-			if findVowel(word[i]) and not findVowel(word[i-1]):
-				syllables+=1
-				#print(word[i], " is syllable in ", word)
 			#handles two vowels in a row
 			#i.e. spool, cool, moon
-			#if ((i-1) >= 0 and findVowel(word[i-1]) and findVowel(word[i])):					
-				#syllables+=1
-			#	continue
+			if findVowel(word[i]) and not findVowel(word[i-1]):
+				syllables+=1
 				
 	if syllables == 0:
 		syllables = 1
