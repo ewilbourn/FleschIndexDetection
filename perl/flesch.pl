@@ -2,11 +2,7 @@
 use strict;
 use warnings;
 
-
 use Scalar::Util qw(looks_like_number);
-
-#all lines is all the lines in the array; splits the line by spaces and 
-
 
 # Grab the name of the file from the command line, exit if no name given
 my $filename = $ARGV[0] or die "Need to get file name on the command line\n";
@@ -40,4 +36,4 @@ foreach my $line (@all_lines)
 print "@all_words\n";
 
 #print the word count
-print "$word_count";
+print "Word Count: ", "$word_count";
