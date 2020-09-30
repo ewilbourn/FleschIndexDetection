@@ -24,7 +24,7 @@ my $sentence_count = 0;
 
 #instantiate an array that holds all the punctuation
 my @punctuation = (".", ";", ":", "!", "?");
-
+my @other_punctuation = ("[", ",", "]");
 #Now take each line and break it into tokens based on spaces and print the token
 foreach my $line (@all_lines)
 {
@@ -44,6 +44,10 @@ foreach my $line (@all_lines)
 			{
 				$sentence_count++ if(($char cmp $punct) == 0);
 				$token =~ s/\Q$char// if (($char cmp $punct) == 0);
+				for my $other_punct(@other_punctuation)
+				{	
+					$token =~ s/\Q$char// if (($char cmp $other_punct) == 0);
+				}
 			}
 		}
 		#if the token, aka the word, doesn't look like a number,
