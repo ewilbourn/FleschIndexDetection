@@ -21,10 +21,6 @@ public class flesch
 		//initialize a new ArrayList<String> with the words that have the punctuation removed 
 		ArrayList<String> newWords = removePunctuation(words);
 	
-//		for (int i = 0; i < newWords.size(); i++)
-//		{		
-//			System.out.println(newWords.get(i));
-//		}	
 		int numSyll = totalSyllables(words);
 		int numWords = totalWords(words);
 		int hardWords = challengingWords(newWords);
@@ -45,17 +41,20 @@ public class flesch
 	//ArrayList, which is returned
 	public static ArrayList<String> findWords(ArrayList <String> words, String input) throws IOException
 	{
-        	Scanner sc = new Scanner(new File(input));
-		
-		while(sc.hasNext())
+        	BufferedReader buffReader = new BufferedReader(new FileReader(input));
+		String line;
+		while((line = buffReader.readLine()) != null)
         	{
-			String fileInput = sc.next();
-			//if the word, sc.next(), is not a number, add it to the ArrayList
-			if(!isNumber(fileInput))
-				words.add(fileInput.toLowerCase());
+			//split the line on the spaces and store each word in the str_words
+			String[] str_words = line.split(" ");
+			for (String word : str_words)
+			{
+				//if the word is not a number, add it to the ArrayList
+				if(!isNumber(word))
+					words.add(word.toLowerCase());
+			}
 		}	
 
-		sc.close();
 		return words;
 	}
 	
@@ -235,7 +234,6 @@ public class flesch
 		
 		double index = (a*11.8) + (b*0.39) - 15.59;
 	        return (Math.round(index*10)/10.0);
-		//return index;	
 	}
 		
 	//add method to determine the dale-chall index
@@ -251,7 +249,6 @@ public class flesch
 		if((a*100) > 5)
 			index += 3.6365;
 		return (Math.round(index*10)/10.0);
-		//return index;
 	}
 
 	//method to perform a binary search
