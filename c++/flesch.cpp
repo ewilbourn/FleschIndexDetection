@@ -239,7 +239,7 @@ double daleChallIndex(vector<string> words, int numSentences, int numWords)
 	double a = ((double)hardWords/(double)numWords);
         double b = ((double)numWords/(double)numSentences);
         double index = ((a*100)*0.1579)+(b*0.0496);
-        if(a < 0.05)
+        if((a*100) > 5)
         	index += 3.6365;
         return round(index*10)/10;
 }
