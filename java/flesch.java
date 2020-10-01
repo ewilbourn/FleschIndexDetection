@@ -21,10 +21,10 @@ public class flesch
 		//initialize a new ArrayList<String> with the words that have the punctuation removed 
 		ArrayList<String> newWords = removePunctuation(words);
 	
-		//for (int i = 0; i < newWords.size(); i++)
-		//{		
-		//	System.out.println(newWords.get(i));
-		//}	
+//		for (int i = 0; i < newWords.size(); i++)
+//		{		
+//			System.out.println(newWords.get(i));
+//		}	
 		int numSyll = totalSyllables(words);
 		int numWords = totalWords(words);
 		int hardWords = challengingWords(newWords);
@@ -64,37 +64,22 @@ public class flesch
 		ArrayList<String> newWords = new ArrayList<String>();
 		for(int i = 0; i < words.size(); i++)
                 {
-			String word1 = words.get(i);
                         String word = words.get(i);
                 	for (int j = 0; j < word.length(); j++)
                 	{
-                		if (isPunctuation(word.charAt(j)) || isOtherPunct(word.charAt(j)))
+                		if (!Character.isLetter(word.charAt(j)))
 				{	
 					String letter = Character.toString(word.charAt(j));
-					word1 = word.replace(letter, "");
+					word = word.replace(letter, "");
 				}
 			}
-                	newWords.add(word1);
+                	newWords.add(word);
                 }
 		return newWords;
 
 	}
 
 
-	public static boolean isOtherPunct(char c)
-	{
-		char [] otherpunct = {'[', ']', '$', ','};
-		for(int i = 0; i < otherpunct.length; i++)
-		{
-			if (Character.compare(c, otherpunct[i]) == 0)
-				return true;
-			if((Character.toString(c)).equals("'"))
-				return true;
-		}
-		return false;
-
-	}
-	
 	//method to determine if a char is a vowel
 	//precondition: passes in a character
 	//postcondition: returns a boolean that tells us if the char is a vowel
@@ -263,7 +248,7 @@ public class flesch
                 double a = ((double)difficultWords/(double)numWords);
                 double b = ((double)numWords/(double)numSentences);
 		double index = ((a*100)*0.1579)+(b*0.0496);
-		if(a < 0.05)
+		if((a*100) > 5)
 			index += 3.6365;
 		return (Math.round(index*10)/10.0);
 		//return index;
