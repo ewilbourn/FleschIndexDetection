@@ -101,7 +101,8 @@ foreach my $line (@dale_chall)
 
 @new_dale_chall = sort{$a cmp $b} @new_dale_chall;
 #calculate the number of difficult words in the text file
-#by comparing the contents to the dale-chall list
+#by comparing the contents to the dale-chall list by utilizing a 
+#binary search
 foreach my $key(@all_words)
 {
 
@@ -143,14 +144,22 @@ foreach my $key(@all_words)
 }
 
 
+#calculate dale-chall index
+my $a = ($difficult_word_count)/($word_count);
+my $b = ($word_count)/($sentence_count);
+
+my $d_c_index = (($a*100)*0.1579)+(($b)*0.0496);
+$d_c_index = $d_c_index+3.6365 if(($a*100) > 5);
+
 #print the word count
-#print "\nWord Count: ", "$word_count";
+print "\nWord Count: ", "$word_count";
 
 
 #print the sentence count
-#print "\nSentence Count: ", "$sentence_count";
+print "\nSentence Count: ", "$sentence_count";
 
 print "\nDifficult Words: ", "$difficult_word_count";
 #print "@new_dale_chall\n";
 #print"\n";
+print "\n$d_c_index";
 
