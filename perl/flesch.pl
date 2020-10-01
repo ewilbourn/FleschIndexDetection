@@ -51,6 +51,12 @@ my @punctuation = (".", ";", ":", "!", "?");
 #remove from the words we are reading in
 my @other_punctuation = ("[", ",", "]");
 
+
+my @vowel_list = ("a","e","i","o","u","y");
+my $syllable_count = 0;
+
+
+
 #Now take each line and break it into tokens based on spaces and print the token
 foreach my $line (@all_lines)
 {
@@ -74,6 +80,7 @@ foreach my $line (@all_lines)
 					$token =~ s/\Q$char// if (($char cmp $other_punct) == 0);
 				}
 			}
+			
 		}
 		#make the token, aka the word, all lowercase
 		my $token1 = lc $token;
@@ -81,6 +88,34 @@ foreach my $line (@all_lines)
 		#if the token, aka the word, doesn't look like a number,
 		#then put it into the array of words
 		push(@all_words, $token1) if(!looks_like_number($token));
+	}
+}
+for my $word (@all_words)
+{
+	my @chars = split("", $word);
+	for my $v (@vowel_list)
+	{
+		$syllable_count++ if (($chars[0] cmp $v)==0);
+       	}
+	for (my $i = 1; $i < $#chars; $i++) 
+	{
+        	my $char = $chars[$i];
+		my $prev_char = $chars[$i-1];
+		#this handles when the word ends in an e (which is silent, and thus not a syllable)
+        	if(not (($char cmp 'e') == 0 and $i == ($#chars-1)))
+		{
+        		#handles two vowels in a row
+        		#i.e. spool, cool, moon
+        		for my $v (@vowel_list)
+                        {
+                         	       
+				$syllable_count++ if(($char cmp $v) == 0 && ($prev_char cmp $v) !=0);
+			}
+        	}
+	}
+	if ($syllable_count == 0)
+	{
+        	$syllable_count = 1
 	}
 }
 
@@ -154,6 +189,7 @@ $d_c_index = $d_c_index+3.6365 if(($a*100) > 5);
 #print the word count
 print "\nWord Count: ", "$word_count";
 
+print "\nSyllable Count: ", "$syllable_count";
 
 #print the sentence count
 print "\nSentence Count: ", "$sentence_count";
