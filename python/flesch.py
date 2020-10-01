@@ -159,7 +159,7 @@ def daleChallIndex(words, numSentences):
 	a = difficultWords/numWords
 	b = numWords/numSentences
 	index = ((a*100)*0.1579)+(b*0.0496)
-	if(a < 0.05):
+	if((a*100) > 5):
 		index += 3.6365;
 
 	#return the index (float) rounded to 1 decimal place
