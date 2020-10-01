@@ -90,8 +90,10 @@ foreach my $line (@all_lines)
 		push(@all_words, $token1) if(!looks_like_number($token));
 	}
 }
+my $total_syll_count = 0;
 for my $word (@all_words)
 {
+	$syllable_count = 0;
 	my @chars = split("", $word);
 	for my $v (@vowel_list)
 	{
@@ -117,6 +119,9 @@ for my $word (@all_words)
 	{
         	$syllable_count = 1
 	}
+	
+	$total_syll_count += $syllable_count;
+	
 }
 
 #initialize variable to hold the number of difficult words
@@ -179,6 +184,15 @@ foreach my $key(@all_words)
 }
 
 
+#calculate flesch readability index
+my $a1 = ($total_syll_count)/($word_count);
+my $b1 = ($word_count)/($sentence_count);
+my $flesch_index = 206.835-(($a1)*84.6)-($b1)*(1.015);
+
+
+#calculate flesch-kincaid readability index
+my $flesch_kincaid = ($a1)*11.8+($b1)*0.39-15.59;
+
 #calculate dale-chall index
 my $a = ($difficult_word_count)/($word_count);
 my $b = ($word_count)/($sentence_count);
@@ -189,7 +203,7 @@ $d_c_index = $d_c_index+3.6365 if(($a*100) > 5);
 #print the word count
 print "\nWord Count: ", "$word_count";
 
-print "\nSyllable Count: ", "$syllable_count";
+print "\nSyllable Count: ", "$total_syll_count";
 
 #print the sentence count
 print "\nSentence Count: ", "$sentence_count";
@@ -197,5 +211,7 @@ print "\nSentence Count: ", "$sentence_count";
 print "\nDifficult Words: ", "$difficult_word_count";
 #print "@new_dale_chall\n";
 #print"\n";
-print "\n$d_c_index";
+print "\nFlesch Index: ","$flesch_index";
+print "\nFlesch-Kincaid: ", "$flesch_kincaid";
+print "\nDale Chall Index: ", "$d_c_index";
 
