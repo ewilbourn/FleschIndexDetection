@@ -12,9 +12,12 @@ program reader
      logical:: o
    end function is_sentence
  end interface
-
+ 
+ !read in the input file name form the command line
+ !i.e. a.out /pub/pounds/CSC330/translations/KJV.txt
  call get_command_argument(1,input_string)
  
+ !open our file
  open(unit=5,status="old",access="direct",form="unformatted",recl=1,&
   file=input_string)
 
@@ -30,8 +33,6 @@ program reader
   char_counter=char_counter-1
   close (5)
 
-
-!call read_file( long_string, input_string, filesize, num_sentences )
  print *, input_string
  print *, "Read ", char_counter, " characters."
  print *, "Number of Sentences: ", sentence_counter
