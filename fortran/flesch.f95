@@ -3,10 +3,10 @@ program reader
  character (LEN=5000000) :: long_string, new_long_string
  character (LEN=100) :: input_string 
  character (LEN=50) :: temp_string
- character (LEN = 50), dimension(5000000) :: tokenized_words
+ character (LEN = 20), dimension(5000000) :: tokenized_words
  !character (LEN = 50), dimension(5000000) ::
  integer :: char_counter, sentence_counter, space_counter, pos1 = 1, pos2,&
-            ascii, i, n=0
+            ascii, i, n=0, word_counter=0
  character (LEN=1) :: input
 
  interface
@@ -27,6 +27,18 @@ program reader
      integer :: ascii_num
      logical :: o
    end function is_number
+   
+   function to_upper(in) result(out)
+     implicit none
+     character(LEN=1) :: in
+     character(:), allocatable :: out
+   end function to_upper
+
+   function other_punct (l) result (o)
+     implicit none
+     character(LEN=1) :: l
+     logical :: o
+   end function other_punct
  end interface
 
  
@@ -40,12 +52,11 @@ program reader
 
   char_counter=1
   100 read (5,rec=char_counter,err=200) input
-    long_string(char_counter:char_counter) = input
+    if ((.not. is_sentence(input)) .and. (.not.other_punct(input)))then
+    long_string(char_counter:char_counter) = to_upper(input)
+    endif
     if (is_sentence(input))then
     sentence_counter=sentence_counter+1
-    endif
-    if(is_space(input))then
-    space_counter=space_counter+1
     endif
     char_counter=char_counter+1
     goto 100
@@ -82,11 +93,11 @@ program reader
    pos1 = pos2+pos1
  end do
 
- print *, n
-
  do i = 1, n
-        print*,tokenized_words(i)
+        print*,"Token:",tokenized_words(i)
+        word_counter = word_counter+1
  end do
+ print *, word_counter
  !print *, tokenized_words
  !tokenize the long_string
  !print *, new_long_string
@@ -120,6 +131,23 @@ logical function is_sentence( letter ) result(out)
   endif
 end function is_sentence
 
+
+logical function other_punct(letter) result (out)
+  character(LEN=1) :: letter
+  out = .false.
+  if (index(letter,"#") .ne. 0) then
+    out = .true.
+  else if (index(letter,"[") .ne. 0) then
+    out = .true.
+  else if (index(letter,"]") .ne. 0) then
+    out = .true.
+  else if (index(letter,",") .ne. 0) then
+    out = .true.
+  else if (index(letter,"$") .ne. 0) then
+    out = .true.
+  endif
+end function other_punct
+
 logical function is_space (one_char) result (out)
   character (LEN=1) :: one_char
   out = .false.
@@ -141,3 +169,21 @@ logical function is_number (num) result (out)
   end do
 
 end function is_number
+
+function to_upper(in) result(out)
+
+character(LEN=1)  :: in
+character(:), allocatable :: out
+integer                   :: i, j
+
+! The following should work with any character set 
+character(*), parameter   :: upp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+character(*), parameter   :: low = 'abcdefghijklmnopqrstuvwxyz'
+out = in                                            
+do i = 1, LEN_TRIM(out)             
+    j = INDEX(low, out(i:i))        
+    if (j > 0) out(i:i) = upp(j:j)  
+end do
+
+end function to_upper
+
