@@ -1,12 +1,11 @@
 program reader
  implicit none
- character (LEN=5000000) :: long_string, new_long_string
+ character (LEN=5000000) :: long_string, new_long_string, dale_chall
  character (LEN=100) :: input_string 
  character (LEN=50) :: temp_string
- character (LEN = 20), dimension(5000000) :: tokenized_words
- !character (LEN = 50), dimension(5000000) ::
+ character (LEN = 20), dimension(5000000) :: tokenized_words, tokenized_d_c
  integer :: char_counter, sentence_counter, space_counter, pos1 = 1, pos2,&
-            ascii, i, n=0, word_counter=0
+            ascii, i, n=0, word_counter=0,pos3
  character (LEN=1) :: input
 
  interface
@@ -39,6 +38,12 @@ program reader
      character(LEN=1) :: l
      logical :: o
    end function other_punct
+
+   function sameString(s1,s2) result (o)
+     implicit none
+     character(LEN=*) :: s1,s2
+     logical :: o
+   end function sameString
  end interface
 
  
@@ -54,6 +59,7 @@ program reader
   100 read (5,rec=char_counter,err=200) input
     if ((.not. is_sentence(input)) .and. (.not.other_punct(input)))then
     long_string(char_counter:char_counter) = to_upper(input)
+   ! print *, "Input: ", input
     endif
     if (is_sentence(input))then
     sentence_counter=sentence_counter+1
@@ -64,24 +70,34 @@ program reader
   char_counter=char_counter-1
   close (5)
 
- !do i=1,char_counter, 1
- !input = long_string(i:i)
- !if (input .ne. " ") then
-  ! do j=1, index(input," "), 1
-  ! ascii = iachar(input)
- !  print *, input
- !  if (.not. is_number(ascii))then
- ! temp_string 
- ! new_long_string(i:i) = input
- !  endif
- !  end do
- !end do
+ do i = 1, char_counter
+    print *, "Input: ", long_string(i:i)
+ end do
+ !open dale-chll file and put all the characters into a string
+ open(unit=5,status="old",access="direct",form="unformatted",recl=1,&
+  file="/pub/pounds/CSC330/dalechall/wordlist1995.txt")
+
+  char_counter=1
+  50 read (5,rec=char_counter,err=150) input
+    if ((.not. is_sentence(input)) .and. (.not.other_punct(input)))then
+    dale_chall(char_counter:char_counter) = to_upper(input)
+    endif
+    char_counter=char_counter+1
+    goto 50
+  150 continue
+  char_counter=char_counter-1
+  close (5)
+  print *, "Dale Chall Size", char_counter 
 
  !this code came from Rosetta Code
  !http://www.rosettacode.org/wiki/Tokenize_a_string#Fortran
+
  do 
    pos2 = index(long_string(pos1:), " ")
-
+   print*, "String: ", long_string(pos1:)
+   print*, "pos2: ", pos2 
+   print*, "pos1: ", pos1
+   print*, " "
    !pos2 being equal to 0 indicates that it wasn't found 
    if (pos2 == 0) then
       n = n+1
@@ -94,14 +110,12 @@ program reader
  end do
 
  do i = 1, n
-        print*,"Token:",tokenized_words(i)
+    !    print*,"Token:",tokenized_words(i)
         word_counter = word_counter+1
  end do
- print *, word_counter
+ !print *, word_counter
  !print *, tokenized_words
- !tokenize the long_string
  !print *, new_long_string
- !print *, input_string
  !print *, "Read ", char_counter, " characters."
  !print *, "Number of Sentences: ", sentence_counter
  !print *, "Number of words: ", space_counter+1
@@ -111,9 +125,7 @@ end program reader
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 logical function is_sentence( letter ) result(out)
   character(LEN=1) :: letter
-  !character(LEN=5) :: punct
   out = .false.
-  !punct =  '.:;?!'
 
   !the index being equal to 0 indicates that something
   !isn't found, so if the index isn't equal to 0 then
@@ -132,6 +144,11 @@ logical function is_sentence( letter ) result(out)
 end function is_sentence
 
 
+!function that determines if a character is one of the 
+!characters that needs to be removed from the file
+!precondition: pass in a character (length = 1)
+!postcondition: return true if the index of the character is 
+!not zero when compared to a specific character, false if it is zero
 logical function other_punct(letter) result (out)
   character(LEN=1) :: letter
   out = .false.
@@ -145,9 +162,16 @@ logical function other_punct(letter) result (out)
     out = .true.
   else if (index(letter,"$") .ne. 0) then
     out = .true.
+  else if (index(letter,"'") .ne. 0) then
+    out = .true.
   endif
 end function other_punct
 
+
+!function that determines if a character is a space
+!precondition: pass in a character (length = 1)
+!postcondition: return true if the index of the character is 
+!not zero when compared to a space, false if it is zero
 logical function is_space (one_char) result (out)
   character (LEN=1) :: one_char
   out = .false.
@@ -157,6 +181,12 @@ logical function is_space (one_char) result (out)
   endif
 end function is_space
 
+
+!function that determines if the ascii character of
+!a character matches the ascii numbers
+!precondition: pass in an integer (ascii value)
+!postcondition: return true if the ascii integer value matches
+!that of a number, and false if it doesn't
 logical function is_number (num) result (out)
   integer :: num
   integer :: i
@@ -170,6 +200,11 @@ logical function is_number (num) result (out)
 
 end function is_number
 
+!function to make a single character uppercase
+!this came from Dr. Pounds
+!I need to use this on my tokenized words as well as
+!the tokenized dale-chall list so that I can properly 
+!compare words
 function to_upper(in) result(out)
 
 character(LEN=1)  :: in
@@ -186,4 +221,19 @@ do i = 1, LEN_TRIM(out)
 end do
 
 end function to_upper
+
+!function that compares two strings (came from Dr. Pounds)
+!precondition: pass in two strings
+!postcondition: return a logical (true if strings are the same,
+!false if they are not)
+logical function sameString ( string1, string2 ) result(out)
+
+character(LEN=*) :: string1, string2
+out = .false.
+
+if ( len(trim(adjustl(string1))) .eq. len(trim(adjustl(string2))) ) then
+    if ( index(trim(adjustl(string1)), trim(adjustl(string2))) .ne. 0 ) out = .true.
+endif
+
+end function sameString
 
