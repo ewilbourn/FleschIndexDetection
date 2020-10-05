@@ -8,11 +8,10 @@ public class flesch
 	public static void main(String[] args) throws IOException
 	{
 		Scanner in = new Scanner (System.in);
-		File directoryPath = new File("/pub/pounds/CSC330/translations");
-		System.out.print("Enter the name of the input file: ");
 	
-		//read in input from the user; this is reading in the input file
-		String inputFile = in.nextLine();
+		//read in the file name from the user via the command line
+		//i.e. java flesch /pub/pounds/CSC330/translations/KJV.txt
+                String inputFile = args[0];
 		ArrayList <String> words = new ArrayList <String>();
 		words = findWords(words,inputFile);
 		ArrayList <String> hard = createDaleChallList();		
