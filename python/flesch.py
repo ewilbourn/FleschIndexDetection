@@ -49,8 +49,11 @@ def findVowel(character):
 #postcondition: return the number of syllables in a word (integer)
 def findSyllables(word):
 	syllables = 0
-	if findVowel(word[0]):
-		syllables+=1
+	try:
+		if findVowel(word[0]):
+			syllables+=1
+	except:	
+		syllables = 0
 	for i in range(1, len(word)):
 	#this handles when the word ends in an e (which is silent, and thus not a syllable)
 		if(not ((word[i]).lower() == 'e' and i == (len(word)-1))):
@@ -175,11 +178,14 @@ def daleChallIndex(words, numSentences):
 
 def main():
 	#receives command line input for the file name
-	#command to enter for KJV.txt: python3 flesch.py /pub/pounds/CSC330/translations/KJV.txt
-	#here, /pub/pounds/CSC330/translations/KJV.txt will be stored in inputFile
-	inputFile = str(sys.argv[1])
+	#command to enter for KJV.txt: python3 flesch.py KJV
+	#here, KJV will be stored in inputF
+	inputF = str(sys.argv[1])
 
-	#instantiate a set
+	
+	inputFile = "/pub/pounds/CSC330/translations/" + inputF + ".txt"
+
+	#instantiate a list
 	words = []
 
 	#fill up the list with the words from the text file
@@ -190,14 +196,21 @@ def main():
 	daleChall = daleChallIndex(words, numSentences)
 	flesch = fleschIndex(words, numSentences)
 	fleschKincaid = fleschKincaidIndex(words, numSentences)
+	
+	if(len(inputF) == 3):
+		print("Python     " , inputF, "           " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
 
-	print("Number of Sentences: ", numSentences)
-	print("Number of Words: ", numWords)
-	print("Number of Syllables: ", numSyllables)
-	print("Number of Challenging Words: ", numChallWords)
-	print("Flesch Index: ", flesch)
-	print("Flesch-Kincaid Index: ", fleschKincaid)
-	print("Dale Chall Index: ", daleChall)
+	if(len(inputF) == 4):
+		print("Python     " , inputF, "          " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
+	if(len(inputF) == 5):
+		print("Python     " , inputF, "         " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
+	#print("Number of Sentences: ", numSentences)
+	#print("Number of Words: ", numWords)
+	#print("Number of Syllables: ", numSyllables)
+	#print("Number of Challenging Words: ", numChallWords)
+	#print("Flesch Index: ", flesch)
+	#print("Flesch-Kincaid Index: ", fleschKincaid)
+	#print("Dale Chall Index: ", daleChall)
 #################################################################################
 
 main()
