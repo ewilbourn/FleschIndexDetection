@@ -149,6 +149,9 @@ program reader
    len(long_string(pos1:pos2+pos1-2)))) then
    n = n+1
    tokenized_words(n) = long_string(pos1:pos2+pos1-2)
+     if(len(long_string(pos1:pos2+pos1-2)) > 0) then
+     word_counter=word_counter+1
+     end if
    end if
    pos1 = pos2+pos1
  end do
@@ -179,11 +182,11 @@ program reader
 ! end do
  do i = 1, n
    word = tokenized_words(i)
-   print*,"Token:",tokenized_words(i)
+  ! print*,"Token:",tokenized_words(i)
            
-   word_counter = word_counter+1
+   !word_counter = word_counter+1
  end do
-! print *,"Word Count: ", word_counter
+ print *,"Word Count: ", word_counter
  !print *, tokenized_words
  !print *, "Read ", char_counter, " characters."
  !print *, "Number of Sentences: ", sentence_counter
