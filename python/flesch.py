@@ -198,12 +198,12 @@ def main():
 	fleschKincaid = fleschKincaidIndex(words, numSentences)
 	
 	if(len(inputF) == 3):
-		print("Python     " , inputF, "           " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
+		print("Python    " , inputF, "         " , flesch, "     ", fleschKincaid, "            ", daleChall,"          ");
 
 	if(len(inputF) == 4):
-		print("Python     " , inputF, "          " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
+		print("Python    " , inputF, "        " , flesch, "     ", fleschKincaid, "            ", daleChall,"          ");
 	if(len(inputF) == 5):
-		print("Python     " , inputF, "         " , flesch, "       ", fleschKincaid, "              ", daleChall,"          ");
+		print("Python    " , inputF, "       " , flesch, "     ", fleschKincaid, "            ", daleChall,"          ");
 	#print("Number of Sentences: ", numSentences)
 	#print("Number of Words: ", numWords)
 	#print("Number of Syllables: ", numSyllables)
