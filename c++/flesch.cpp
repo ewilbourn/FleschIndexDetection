@@ -22,12 +22,12 @@ double fleschKincaidIndex(vector <string> words, int numSentences, int totalWord
 int fleschIndex(vector<string>words, int numSentences, int totalWords);
 double daleChallIndex(vector<string> words,int numSentences, int totalWords);
 
-int main ()
+int main (int argc, char *argv[])
 {
 	string input;
-	cout << "Enter the name of the input file: ";
-	cin >> input;
-
+	//cout << "Enter the name of the input file: ";
+	//cin >> input;
+        input = argv[1];
 	vector<string> words(1);
 	
 	int numSentences = 0;
