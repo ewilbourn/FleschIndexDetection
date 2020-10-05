@@ -14,18 +14,17 @@ sub binSearch
 
 
 # Grab the name of the file from the command line, exit if no name given
-my $filename = $ARGV[0] or die "Need to get file name on the command line\n";
+#just take in the name of the file, not the whole path
+my $name = $ARGV[0] or die "Need to get file name on the command line\n";
+
+
+#variable to hold the full file path
+my $filename = '/pub/pounds/CSC330/translations/' . $name . '.txt';
 
 # Use the filename
 open(DATA, "<$filename") or die "Couldn't open file $filename, $!";
 
-#open my $d_c, '<', "pub/pounds/CSC330/dalechall";
-#chomp(my @dale_chall = <$d_c>);
-#close $d_c;
 
-#my $data_d_c = "pub/pounds/CSC330/dalechall";
-
-#"/pub/pounds/CSC330/dalechall";
 # Open the Dale-Chall list and collect the data inside it
 open(DATA1, "<", "/pub/pounds/CSC330/dalechall/wordlist1995.txt") or die "Couldn't open file $filename, $!";
 
@@ -35,6 +34,7 @@ my @dale_chall = <DATA1>;
 #The next line puts all the lines from the text file into an array called @all_lines
 my @all_lines = <DATA>;
 
+close DATA;
 #array to hold individual words
 my @all_words = ();
 
@@ -97,14 +97,19 @@ for my $word (@all_words)
 	my @chars = split("", $word);
 	for my $v (@vowel_list)
 	{
-		$syllable_count++ if (($chars[0] cmp $v)==0);
-       	}
+
+		if (defined $chars[0])
+		{
+			$syllable_count++ if (($chars[0] cmp $v)==0);
+		}        
+	}
 	for (my $i = 1; $i < $#chars; $i++) 
 	{
         	my $char = $chars[$i];
 		my $prev_char = $chars[$i-1];
 		#this handles when the word ends in an e (which is silent, and thus not a syllable)
-        	if(not (($char cmp 'e') == 0 and $i == ($#chars-1)))
+        	
+		if(not (($char cmp 'e') == 0 and $i == ($#chars-1)) and (defined $char))
 		{
         		#handles two vowels in a row
         		#i.e. spool, cool, moon
@@ -188,10 +193,11 @@ foreach my $key(@all_words)
 my $a1 = ($total_syll_count)/($word_count);
 my $b1 = ($word_count)/($sentence_count);
 my $flesch_index = 206.835-(($a1)*84.6)-($b1)*(1.015);
-
+my $round_f = sprintf("%.0f",$flesch_index);
 
 #calculate flesch-kincaid readability index
 my $flesch_kincaid = ($a1)*11.8+($b1)*0.39-15.59;
+my $round_fk = sprintf("%.1f", $flesch_kincaid);
 
 #calculate dale-chall index
 my $a = ($difficult_word_count)/($word_count);
@@ -199,19 +205,17 @@ my $b = ($word_count)/($sentence_count);
 
 my $d_c_index = (($a*100)*0.1579)+(($b)*0.0496);
 $d_c_index = $d_c_index+3.6365 if(($a*100) > 5);
-
+my $round_dc = sprintf("%.1f", $d_c_index);
 #print the word count
-print "\nWord Count: ", "$word_count";
+#print "\nWord Count: ", "$word_count";
 
-print "\nSyllable Count: ", "$total_syll_count";
+#print "\nSyllable Count: ", "$total_syll_count";
 
 #print the sentence count
-print "\nSentence Count: ", "$sentence_count";
+#print "\nSentence Count: ", "$sentence_count";
 
-print "\nDifficult Words: ", "$difficult_word_count";
+#print "\nDifficult Words: ", "$difficult_word_count";
 #print "@new_dale_chall\n";
-#print"\n";
-print "\nFlesch Index: ","$flesch_index";
-print "\nFlesch-Kincaid: ", "$flesch_kincaid";
-print "\nDale Chall Index: ", "$d_c_index";
+print "Perl       " , $name, "           " , $round_f, "       ", $round_fk, "              ", $round_dc,"          ";
+print"\n";
 
