@@ -1,11 +1,23 @@
+//included this to print out statements using cout
 #include <iostream>
+
+//included this to read in files
 #include <fstream>
+
+//included this to store words in a vector data type
 #include <vector>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+
+//included this to transform words to lowercase in line 194,
+//sort the dale-chall list in line 198, perform a binary search
+//in line 212, and to access the first element in the word list to
+//erase a word in line 82
 #include <algorithm>
+
+//included this library to round values in lines 234 and 245
 #include <cmath>
+
+//included this library to set the precision when printing out the indexes
+//that require decimal points
 #include <iomanip>
 
 using namespace std;
@@ -24,15 +36,15 @@ double daleChallIndex(vector<string> words,int numSentences, int totalWords);
 
 int main (int argc, char *argv[])
 {
-	string input;
-	//cout << "Enter the name of the input file: ";
-	//cin >> input;
-        input = argv[1];
+	string filename;
+        
+        //setting input equal to the first value read in on the command line
+        filename = argv[1];
 	vector<string> words(1);
 	
 	int numSentences = 0;
 	int totalWords = 0;
-	getWords(words, input, numSentences, totalWords);
+	getWords(words, filename, numSentences, totalWords);
 	int syll = totalSyllables(words);
 	int hardWords = difficultWords(words);
 	cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
