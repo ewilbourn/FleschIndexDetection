@@ -1,6 +1,10 @@
+#!/usr/bin/python3
 #Emily Wilbourn
 #Python flesch program
-from bisect import bisect_left
+
+
+#importing sys so that I can receive command line input
+import sys
 
 #function to fill a set with all the words from a text file amd return number of sentences
 #precondition: pass in the file name (string) and the set we want to update
@@ -170,8 +174,10 @@ def daleChallIndex(words, numSentences):
 #####################################################################################
 
 def main():
-	print("Enter the name of the input file: ")
-	inputFile = input()
+	#receives command line input for the file name
+	#command to enter for KJV.txt: python3 flesch.py /pub/pounds/CSC330/translations/KJV.txt
+	#here, /pub/pounds/CSC330/translations/KJV.txt will be stored in inputFile
+	inputFile = str(sys.argv[1])
 
 	#instantiate a set
 	words = []
