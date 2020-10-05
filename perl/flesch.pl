@@ -216,6 +216,9 @@ my $round_dc = sprintf("%.1f", $d_c_index);
 
 #print "\nDifficult Words: ", "$difficult_word_count";
 #print "@new_dale_chall\n";
-print "Perl       " , $name, "           " , $round_f, "       ", $round_fk, "              ", $round_dc,"          ";
+
+print "Perl       " , $name, "           " , $round_f, "       ", $round_fk, "              ", $round_dc,"          " if length($name == 3);
+print "Perl       " , $name, "          " , $round_f, "       ", $round_fk, "              ", $round_dc,"          " if length($name == 4);
+print "Perl       " , $name, "         " , $round_f, "       ", $round_fk, "              ", $round_dc,"          " if length($name == 5);
 print"\n";
 
