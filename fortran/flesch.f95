@@ -7,7 +7,7 @@ program reader
  character (LEN=20), dimension(50000000) :: tokenized_words, tokenized_d_c
  !character, dimension(:), allocatable :: tokenized_words, tokenized_d_c
  integer :: char_counter, sentence_counter, space_counter, pos1 = 1, pos2,&
-            ascii, i,j, n=0, word_counter=0,pos3, filesize
+            ascii, i,j, n=0, word_counter=0, filesize, syllable_counter
  character (LEN=1) :: input
 
  !create an integer array of the lengths of each word in the tokenized_words
@@ -27,10 +27,11 @@ program reader
      logical :: o
    end function is_space
 
-   function is_number (ascii_num) result (o)
+   function is_number (w, w_length) result (val)
      implicit none
-     integer :: ascii_num
-     logical :: o
+     integer :: num, i, w_length, counter
+     character (LEN=*) :: w
+     logical :: val
    end function is_number
    
    function to_upper(in) result(out)
@@ -50,26 +51,31 @@ program reader
      character(LEN=*) :: s1,s2
      logical :: o
    end function sameString
+  
    function is_new_line (l) result (o)
      implicit none
      character(LEN=1) :: l
      integer :: i
      logical :: o
    end function is_new_line
+ 
    function countSyllables (s1, word_length) result (o)
    character(LEN=*) ::s1
    integer :: o
    integer :: word_length
+  
    !initialize the previous_letter to be false, since in a word, the first
    !letter, which is the current_letter, doesn't have any letters in front
    !of it
    logical :: previous_letter=.false.
    logical :: current_letter
    end function countSyllables
+   
    function is_vowel(l) result (o)
    character(LEN=1) :: l
    logical :: o
    end function is_vowel
+ 
  end interface
 
  
@@ -136,10 +142,14 @@ program reader
       tokenized_words(n) = long_string(pos1:)
       exit
    end if
+
+   !if the tokenized word is not a number, then add it to the tokenized_words
+   !list
+   if(.not. is_number(long_string(pos1:pos2+pos1-2), &
+   len(long_string(pos1:pos2+pos1-2)))) then
    n = n+1
-   word_lengths(n) = len(trim(adjustl(long_string(pos1:pos2+pos1-2))))
-   print*, "Word Lengths: ", word_lengths(n)
    tokenized_words(n) = long_string(pos1:pos2+pos1-2)
+   end if
    pos1 = pos2+pos1
  end do
 
@@ -170,7 +180,7 @@ program reader
  do i = 1, n
    word = tokenized_words(i)
    print*,"Token:",tokenized_words(i)
-   
+           
    word_counter = word_counter+1
  end do
 ! print *,"Word Count: ", word_counter
@@ -268,16 +278,35 @@ end function is_space
 !precondition: pass in an integer (ascii value)
 !postcondition: return true if the ascii integer value matches
 !that of a number, and false if it doesn't
-logical function is_number (num) result (out)
-  integer :: num
-  integer :: i
-  out = .false.
+logical function is_number (word, word_length) result (val)
+  integer :: num, i, word_length, counter
+  character (LEN=*) :: word
+  val = .false.
+  counter = 0
+  !iterate through the string that was passed in
+  !anytime we find a number in the string, we increment 
+  !our counter
+  iloop:do i = 1, word_length,1
+  jloop:do j = 48, 57, 1
 
-  do i = 48, 57, 1
-  if (num == i) then
-  out = .true.
+
+  !if the ascii value of the current character equals that of 
+  !j, a number ascii value (i.e. the ascii value for 0, 1, 2, etc.),
+  !then increment our counter
+  if (iachar(word(i:i)) == j) then
+  counter = counter+1
   endif 
-  end do
+
+  end do jloop 
+  end do iloop
+
+
+  !the counter is equal to the word length, then we know 
+  !we have a number because each character in the string is
+  !a digit
+  if (counter == word_length) then
+  val = .true.
+  end if
 
 end function is_number
 
@@ -344,19 +373,36 @@ integer function countSyllables (string1, word_length) result (out)
    !initialize the previous_letter to be false, since in a word, the first
    !letter, which is the current_letter, doesn't have any letters in front
    !of it
-   logical :: previous_letter=.false.
+   logical :: previous_letter, is_syllable
+   character(LEN=1) :: letter
    logical :: current_letter
+   previous_letter = .false.
+   is_syllable = .false.
    out = 0
-   do i = 1, word_length, 1
+   
+  do i = 1, word_length, 1
+   if (index(string1(i:i),"A") .ne. 0) then
+    is_syllable = .true.
+   else if (index(string1(i:i),"E") .ne. 0) then
+    is_syllable = .true.
+   else if (index(string1(i:i),"I") .ne. 0) then
+    is_syllable = .true.
+   else if (index(string1(i:i),"O") .ne. 0) then
+    is_syllable = .true.
+   else if (index(string1(i:i),"U") .ne. 0) then
+    is_syllable = .true.
+   else if (index(string1(i:i),"Y") .ne. 0) then
+    is_syllable = .true.
+   end if
    if (.not.((i == word_length) .and. (index(string1(i:i),"E") .ne. 0) .and.&
        (previous_letter .eqv. .false.)))then
-   !  if(is_vowel(string1(i:i)))then
+   if(is_syllable)then
      out=out+1
      current_letter = .true.
-    ! end if
-     if(current_letter .eqv. previous_letter)then
+   end if
+   if(current_letter .eqv. previous_letter)then
      out = out -1
-     end if
+   end if
    end if
    end do
 
