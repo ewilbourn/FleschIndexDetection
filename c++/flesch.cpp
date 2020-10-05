@@ -21,6 +21,8 @@
 #include <iomanip>
 
 using namespace std;
+
+//list of all prototype for functions being used in this program
 void getWords(vector<string> &words, string input, int &numSentences, int &numWords);
 bool isNumber(string str);
 int totalWords(vector<string>words);
@@ -37,26 +39,26 @@ double daleChallIndex(vector<string> words,int numSentences, int totalWords);
 int main (int argc, char *argv[])
 {
 	string filename;
-        
+        string directoryPath = "/pub/pounds/CSC330/translations/";
         //setting input equal to the first value read in on the command line
         filename = argv[1];
+	string fullPath = directoryPath + filename + ".txt";
 	vector<string> words(1);
 	
 	int numSentences = 0;
 	int totalWords = 0;
-	getWords(words, filename, numSentences, totalWords);
+	getWords(words, fullPath, numSentences, totalWords);
 	int syll = totalSyllables(words);
 	int hardWords = difficultWords(words);
-	cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
+	//cout << "Sentences: " << numSentences << "\nWords : " << totalWords << "\nSyllables: " << syll << "\nDifficult Words: " << hardWords;
 	
 	int flesch = fleschIndex(words, numSentences, totalWords);
         double flesch_kincaid = fleschKincaidIndex(words, numSentences, totalWords);
         double dale_chall = daleChallIndex(words, numSentences, totalWords);
-        cout << "\nFlesch Readability Index: " << flesch << "\nFlesch-Kincaid Grade Level Index: ";
+	//cout << "Language   Translation   Flesch   Flesch-Kincaid   Dale-Chall" << endl;
+	cout << "C++        " << filename << "           " << flesch << "       ";
 	cout << fixed << setprecision(1);
-	cout << flesch_kincaid;
-	cout << "\nDale-Chall Readability Score: " << dale_chall << endl;
-                
+	cout << flesch_kincaid << "              " << dale_chall << "          " << endl;
 	return 0;
 }
 
