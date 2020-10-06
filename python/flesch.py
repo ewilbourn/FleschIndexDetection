@@ -19,6 +19,7 @@ def tokenizeFile(words, fileName):
 						if findPunctuation(char):
 							numSentences+=1
 							word = word.replace(char,"")
+						#remove unwanted characters from the file
 						if char in ",[]" or char == "'":
 							word = word.replace(char,"")
 					words.append(word.lower())
@@ -204,13 +205,6 @@ def main():
 		print("Python    " , inputF, "        " , flesch, "     ", fleschKincaid, "            ", daleChall,"          ");
 	if(len(inputF) == 5):
 		print("Python    " , inputF, "       " , flesch, "     ", fleschKincaid, "            ", daleChall,"          ");
-	#print("Number of Sentences: ", numSentences)
-	#print("Number of Words: ", numWords)
-	#print("Number of Syllables: ", numSyllables)
-	#print("Number of Challenging Words: ", numChallWords)
-	#print("Flesch Index: ", flesch)
-	#print("Flesch-Kincaid Index: ", fleschKincaid)
-	#print("Dale Chall Index: ", daleChall)
 #################################################################################
 
 main()
