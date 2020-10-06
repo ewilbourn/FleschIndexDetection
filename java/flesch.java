@@ -2,7 +2,6 @@
 //Flesch program in Java
 import java.io.*;
 import java.util.*;
-import java.lang.Math;
 public class flesch
 {
 	public static void main(String[] args) throws IOException
@@ -10,10 +9,12 @@ public class flesch
 		Scanner in = new Scanner (System.in);
 	
 		//read in the file name from the user via the command line
-		//i.e. java flesch /pub/pounds/CSC330/translations/KJV.txt
-                String inputFile = args[0];
-		ArrayList <String> words = new ArrayList <String>();
-		words = findWords(words,inputFile);
+		//i.e. java flesch KJV
+                String filename = args[0];
+		String fullFilePath = "/pub/pounds/CSC330/translations/"+filename+".txt";
+		
+   		ArrayList <String> words = new ArrayList <String>();
+		words = findWords(words,fullFilePath);
 		ArrayList <String> hard = createDaleChallList();		
 		int numSent = countSentences(words);
 
@@ -23,14 +24,31 @@ public class flesch
 		int numSyll = totalSyllables(words);
 		int numWords = totalWords(words);
 		int hardWords = challengingWords(newWords);
-		System.out.println("Sentences: " + numSent + "\nSyllables: " + numSyll + "\nWords: " + numWords + "\nDifficult Words: " + hardWords);	
+		//System.out.println("Sentences: " + numSent + "\nSyllables: " + numSyll + "\nWords: " + numWords + "\nDifficult Words: " + hardWords);	
 		int flesch = fleschIndex(words);
 		double flesch_kincaid = fleschKincaidIndex(words);
 		double dale_chall = daleChallIndex(words, newWords);
-		System.out.println("Flesch Readability Index: " + flesch + "\nFlesch-Kincaid Grade Level Index: " + flesch_kincaid + "\nDale-Chall Readability Score: " + dale_chall);
+	
+        //these if statments spit out the correct formatting for the output based on the length of the 
+        //file name (everything before the .txt; i.e. KJV in KJV.txt) that we're reading in
+	if(filename.length() == 3)
+        {
+                System.out.print("Java       " + filename + "           " + flesch + "       ");
+                System.out.println(flesch_kincaid+"              " + dale_chall + "          ");
+        }
+        if(filename.length() == 4)
+        {
+                System.out.print("Java       " + filename + "          " + flesch + "       ");
+                System.out.println(flesch_kincaid +"              " + dale_chall +"          ");
+        }
+        if(filename.length() == 5)
+        {
+                System.out.print("Java       " + filename + "         " + flesch + "       ");
+                System.out.println(flesch_kincaid + "              " + dale_chall + "          ");
+        }
+
 	}	
 
-	
 	
 	//precondition: reads in an ArrayList of Strings, which we will be modifying
 	//and returning, and a String value, which is the name of the file
@@ -56,7 +74,10 @@ public class flesch
 
 		return words;
 	}
-	
+
+        //method to remove punctuation from our ArrayList of Strings
+        //precondition: pass in the ArrayList of words (Strings)
+        //postcondition: return the new ArrayList without the punctuation	
 	public static ArrayList<String> removePunctuation(ArrayList <String> words)
 	{
 		ArrayList<String> newWords = new ArrayList<String>();
@@ -207,7 +228,7 @@ public class flesch
                 }
 		return false;
 	}
-	//add method to determine the flesch index
+	//method to determine the flesch index
 	//precondition: pass in the arraylist of words
 	//postcondition: return the flesch readability index as an integer
 	public static int fleschIndex(ArrayList<String>words)	
@@ -222,7 +243,9 @@ public class flesch
 		return (int)(Math.round((206.835 - (a*84.6) - (b*1.015))*10)/10.0);
 	}
 	
-	//add method to determine the flesch-kincaid index
+	//method to determine the flesch-kincaid index
+	//precondition: pass in the ArrayList of words (Strings)
+	//postcondition: return a double with the flesch-kincaid index
 	public static double fleschKincaidIndex(ArrayList<String>words)
 	{
 		int numSentences = countSentences(words);
@@ -235,7 +258,11 @@ public class flesch
 	        return (Math.round(index*10)/10.0);
 	}
 		
-	//add method to determine the dale-chall index
+	//method to determine the dale-chall index
+	//precondition: pass in the ArrayList of words before the punctuation was removed (to count sentences)
+	//and pass in the new ArrayList of words (after the punctuation was removed) so we can do all our other
+	//operations
+	//postcondition: return a double that containst the dale-chall index
 	public static double daleChallIndex(ArrayList<String> words, ArrayList<String> newWords)throws IOException
 	{
 		
