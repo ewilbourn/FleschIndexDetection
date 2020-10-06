@@ -1,18 +1,17 @@
 program reader
  implicit none
  character (LEN=5000000) :: long_string, new_long_string, dale_chall
- !character, dimension(:), allocatable :: long_string, new_long_string, dale_chall
- character (LEN=100) :: input_string 
- character (LEN=20) :: word
- character (LEN=20), dimension(50000000) :: tokenized_words, tokenized_d_c
- !character, dimension(:), allocatable :: tokenized_words, tokenized_d_c
+ character (LEN=100) :: input_string , new_input_string , n_input_string
+ character (LEN=8) :: word, new_word
+ character (LEN=20), dimension(50000000) :: tokenized_words, tokenized_dc
  integer :: char_counter, sentence_counter, space_counter, pos1 = 1, pos2,&
-            ascii, i,j, n=0, word_counter=0, filesize, syllable_counter
+            i,j, n=0, word_counter=0, word_counter_dc=0, filesize, syllable_counter, &
+            total_syllable_counter, d_char_counter
  character (LEN=1) :: input
 
  !create an integer array of the lengths of each word in the tokenized_words
  integer, dimension(50000000) :: word_lengths 
-
+ real :: flesch, flesch_kincaid, dale_chall_index
  !an interface is fortran's version of a C++ prototype
  interface
    function is_sentence( l ) result(o)
@@ -80,27 +79,30 @@ program reader
 
  
  !read in the input file name form the command line
- !i.e. a.out /pub/pounds/CSC330/translations/KJV.txt
+ !i.e. a.out KJV.txt
  call get_command_argument(1,input_string)
- 
- inquire(file = input_string, size = filesize)
+ n_input_string = "/pub/pounds/CSC330/translations/"//input_string
 
+ inquire(file = n_input_string, size = filesize)
+ i = 1
  !open our file
  open(unit=5,status="old",access="direct",form="unformatted",recl=1,&
-  file=input_string)
-
+  file=n_input_string)
+ 
   char_counter=1
-  100 read (5,rec=char_counter,err=200) input
+  100 read (5,rec=i,err=200) input
+  i = char_counter   
     if(is_new_line(input))then
-    input = " "
+      input = " "
     end if
-    if ((.not. is_sentence(input)) .and. (.not.other_punct(input))) then
-    long_string(char_counter:char_counter) = to_upper(input)
+    if (is_sentence(input)) then
+      sentence_counter=sentence_counter+1
     endif
-    if (is_sentence(input))then
-    sentence_counter=sentence_counter+1
+    if ((.not. is_sentence(input)) .and. (.not.other_punct(input))) then
+      long_string(char_counter:char_counter) = to_upper(input)
     endif
     char_counter=char_counter+1
+    i = i+1
     goto 100
   200 continue
   char_counter=char_counter-1
@@ -115,21 +117,20 @@ program reader
  open(unit=5,status="old",access="direct",form="unformatted",recl=1,&
   file="/pub/pounds/CSC330/dalechall/wordlist1995.txt")
 
-  char_counter=1
-  i = 1
-  50 read (5,rec=char_counter,err=150) input
+  d_char_counter=1
+  50 read (5,rec=d_char_counter,err=150) input
     if(is_new_line(input))then
     input = " "
     end if
     if ((.not. is_sentence(input)) .and. (.not.other_punct(input)))then
-    dale_chall(char_counter:char_counter) = to_upper(input)
+    dale_chall(d_char_counter:d_char_counter) = to_upper(input)
     endif
-    char_counter=char_counter+1
+    d_char_counter=d_char_counter+1
     goto 50
   150 continue
-  char_counter=char_counter-1
+  d_char_counter=d_char_counter-1
   close (5)
-  print *, "Dale Chall Size", char_counter 
+ ! print *, "Dale Chall Size", d_char_counter 
 
 
  !this code came from Rosetta Code
@@ -143,55 +144,98 @@ program reader
       exit
    end if
 
-   !if the tokenized word is not a number, then add it to the tokenized_words
-   !list
+   !if the tokenized word is not a number, then add it to the 
+   !tokenized_words list
    if(.not. is_number(long_string(pos1:pos2+pos1-2), &
    len(long_string(pos1:pos2+pos1-2)))) then
    n = n+1
    tokenized_words(n) = long_string(pos1:pos2+pos1-2)
      if(len(long_string(pos1:pos2+pos1-2)) > 0) then
      word_counter=word_counter+1
+     !print*, "length: ", len(long_string(pos1:pos2+pos1-2))
      end if
    end if
    pos1 = pos2+pos1
  end do
 
- ! position 1, or pos1, is where we start each word
- !pos1 = 1
- !position 2, or pos2, is where we find the space
- !do while (pos2 .ne. filesize+1)
-   
-   !if the index of the character we are looking at when compared to " "
-   !is not 0, then it is found and we can allocate memory for it in our 
-   !character array
-  ! if(index(long_string(pos2:pos2), " ") .ne. 0) then
-      
-     !filling up the memory we allocated with the word we found
-  !   word=long_string(pos1:pos2)
-     
-     !allocate memory for the word (which is the length from position 2 to
-     !position 1
-  !   allocate(tokenized_words(pos2-pos1))
-     
-     !increment the number of words
-  !   word_counter = word_counter+1
-     
-     !deallocating memory
-  !   deallocate(tokenized_words)
-  ! end if
-! end do
- do i = 1, n
-   word = tokenized_words(i)
-  ! print*,"Token:",tokenized_words(i)
-           
-   !word_counter = word_counter+1
+ ! loop to count the number of syllables in each word
+ syllable_counter = 0
+ total_syllable_counter = 0
+ do j = 1, n, 1
+    word = tokenized_words(j)
+   do i = 1, len(word), 1
+    if (is_vowel(word(i:i))) then
+     syllable_counter = syllable_counter + 1
+    end if
+    if( i == n .and. (index(word(i:i),"E") .ne. 0)) then
+        syllable_counter = syllable_counter -1
+    end if
+  end do
+  if(syllable_counter == 0)then
+        syllable_counter = 1
+  end if
+  total_syllable_counter = total_syllable_counter + syllable_counter
+
  end do
- print *,"Word Count: ", word_counter
- !print *, tokenized_words
- !print *, "Read ", char_counter, " characters."
- !print *, "Number of Sentences: ", sentence_counter
- !print *, "Number of words: ", space_counter+1
- !print *, long_string
+
+ !print *, "Syllables: ", syllable_counter
+ !print *,"Word Count: ", word_counter
+
+ !tokenize the dale_chall list of words held in dale_chall
+ !this code came from Rosetta Code
+ !http://www.rosettacode.org/wiki/Tokenize_a_string#Fortran
+ do
+   pos2 = index(dale_chall(pos1:), " ")
+   
+   !pos2 being equal to 0 indicates that it wasn't found 
+   if (pos2 == 0) then
+      n = n+1
+      tokenized_dc(n) = long_string(pos1:)
+      exit
+   end if
+
+   !if the tokenized word is not a number, then add it to the 
+   !tokenized_words list
+   if(.not. is_number(dale_chall(pos1:pos2+pos1-2), &
+   len(dale_chall(pos1:pos2+pos1-2)))) then
+   n = n+1
+   tokenized_dc(n) = dale_chall(pos1:pos2+pos1-2)
+     if(len(dale_chall(pos1:pos2+pos1-2)) > 0) then
+     word_counter_dc=word_counter_dc+1
+     !print*, "length: ", len(long_string(pos1:pos2+pos1-2))
+     end if
+   end if
+   pos1 = pos2+pos1
+ end do
+
+ !loop to determine the dall_chall word count 
+ do i = 1, d_char_counter, 1
+   if(.not. sameString(tokenized_dc(i),tokenized_words(i))) then
+   word_counter_dc = word_counter_dc+1
+   end if
+ end do
+  
+ flesch = 206.835-((real(syllable_counter)/real(word_counter))*84.6)-&
+ ((real(word_counter)/real(sentence_counter))*1.015)
+
+ flesch_kincaid =(((real(syllable_counter)/real(word_counter))*11.8)) +&
+ (((real(word_counter)/real(sentence_counter))*0.39)) - 15.59
+ 
+ dale_chall_index =(real(word_counter_dc)/real(word_counter))*100*0.1579+&
+((real(word_counter)/real(sentence_counter))*0.0496)
+
+ if (((real(word_counter_dc)/real(word_counter))*100) > 5)then
+ dale_chall_index = dale_chall_index+3.6365
+ end if
+ 
+ word = input_string
+ do i = 1, len(word), 1
+   if(is_new_line(word(i:i)))then
+   word(i:i) = " "
+   end if
+ end do 
+ print*, "Fortran     ", word, "   ", flesch, "     ", flesch_kincaid, "    ",&
+dale_chall_index
 end program reader
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -360,8 +404,8 @@ logical function sameString ( string1, string2 ) result(out)
 character(LEN=*) :: string1, string2
 out = .false.
 
-if ( len(trim(adjustl(string1))) .eq. len(trim(adjustl(string2))) ) then
-    if ( index(trim(adjustl(string1)), trim(adjustl(string2))) .ne. 0 ) out = .true.
+if ( index(trim(adjustl(string1)), trim(adjustl(string2))) .ne. 0 ) then
+out = .true.
 endif
 
 end function sameString
@@ -371,41 +415,45 @@ end function sameString
 !precondition: pass in a string and the length of the string (integer)
 !postcondition: return an integer that holds the number of syllables in a word
 integer function countSyllables (string1, word_length) result (out)
-   character(LEN=*) ::string1
    integer :: word_length
+   character(LEN=word_length) ::string1
    !initialize the previous_letter to be false, since in a word, the first
    !letter, which is the current_letter, doesn't have any letters in front
    !of it
-   logical :: previous_letter, is_syllable
    character(LEN=1) :: letter
-   logical :: current_letter
-   previous_letter = .false.
-   is_syllable = .false.
    out = 0
    
-  do i = 1, word_length, 1
-   if (index(string1(i:i),"A") .ne. 0) then
-    is_syllable = .true.
-   else if (index(string1(i:i),"E") .ne. 0) then
-    is_syllable = .true.
-   else if (index(string1(i:i),"I") .ne. 0) then
-    is_syllable = .true.
-   else if (index(string1(i:i),"O") .ne. 0) then
-    is_syllable = .true.
-   else if (index(string1(i:i),"U") .ne. 0) then
-    is_syllable = .true.
-   else if (index(string1(i:i),"Y") .ne. 0) then
-    is_syllable = .true.
+  do i = 1, word_length-1, 1
+   if (.not.((i+1 == word_length) .and. (index(string1(i:i),"E") .ne. 0))) then 
+    if (index(string1(i:i),"A") .ne. 0) then
+     out = out +1
+    else if (index(string1(i:i),"E") .ne. 0) then
+     out = out + 1
+    else if (index(string1(i:i),"I") .ne. 0) then
+     out = out +1
+    else if (index(string1(i:i),"O") .ne. 0) then
+     out = out +1
+    else if (index(string1(i:i),"U") .ne. 0) then
+     out = out +1
+    else if (index(string1(i:i),"Y") .ne. 0) then
+     out = out + 1
+    end if
    end if
-   if (.not.((i == word_length) .and. (index(string1(i:i),"E") .ne. 0) .and.&
-       (previous_letter .eqv. .false.)))then
-   if(is_syllable)then
-     out=out+1
-     current_letter = .true.
-   end if
-   if(current_letter .eqv. previous_letter)then
+   if ((index(string1((i+1):(i+1)),"A") .ne. 0).and.(index(string1(i:i),"A") .ne.&
+0)) then
      out = out -1
-   end if
+   else if ((index(string1((i+1):(i+1)),"E") .ne. 0).and.(index(string1(i:i),"E")&
+.ne. 0)) then
+    out = out - 1
+   else if ((index(string1((i+1):(i+1)),"I") .ne. 0).and.(index(string1(i:i),"E") .ne.&
+0)) then
+    out = out -1
+   else if ((index(string1((i+1):(i+1)),"O") .ne. 0).and.(index(string1(i:i),"O")&
+.ne. 0)) then
+    out = out -1
+   else if ((index(string1((i+1):(i+1)),"O") .ne. 0).and.(index(string1(i:i),"U")&
+.ne. 0)) then
+    out = out -1
    end if
    end do
 
