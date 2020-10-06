@@ -1,3 +1,7 @@
+//Emily Wilbourn
+//Flesch program in C++
+
+
 //included this to print out statements using cout
 #include <iostream>
 
@@ -56,11 +60,26 @@ int main (int argc, char *argv[])
         double flesch_kincaid = fleschKincaidIndex(words, numSentences, totalWords);
         double dale_chall = daleChallIndex(words, numSentences, totalWords);
 	//cout << "Language   Translation   Flesch   Flesch-Kincaid   Dale-Chall" << endl;
-	cout << "C++        " << filename << "           " << flesch << "       ";
-	cout << fixed << setprecision(1);
-	cout << flesch_kincaid << "              " << dale_chall << "          " << endl;
+	if(filename.length() == 3)
+	{
+		cout << "C++        " << filename << "           " << flesch << "       ";
+		cout << fixed << setprecision(1);
+		cout << flesch_kincaid << "              " << dale_chall << "          " << endl;
+	}
+	if(filename.length() == 4)
+	{
+		cout << "C++        " << filename << "          " << flesch << "       ";
+		cout << fixed << setprecision(1);
+		cout << flesch_kincaid << "              " << dale_chall << "          " << endl;
+	}
+	if(filename.length() == 5)
+	{
+		cout << "C++        " << filename << "         " << flesch << "       ";
+		cout << fixed << setprecision(1);
+		cout << flesch_kincaid << "              " << dale_chall << "          " << endl;
+	}
 	return 0;
-}
+}	
 
 //method to add all the words to a vector
 //precondition: pass in the empty vector that we're filling and the name of the file we're opening
@@ -227,6 +246,9 @@ int difficultWords(vector <string> words)
         return difficultWords;
 }
 
+//method to calculate the flesch-kincaid index
+//precondition: pass in the vector of words (Strings), the number of sentences in the file, and the number of words
+//postcondition: return a double that has the flesch-kincaid index within it
 double fleschKincaidIndex(vector<string>words, int numSentences, int numWords)
 {
         int totalSyll = totalSyllables(words);
@@ -237,6 +259,9 @@ double fleschKincaidIndex(vector<string>words, int numSentences, int numWords)
 	return index;
 }
 
+//method to calculate the flesch readability index
+//precondition: pass in the vector of words (strings), the number of sentences in a file, and the number of words in a file
+//postcondition: return an integer with the flesch index
 int fleschIndex(vector<string>words, int numSentences, int numWords)
 {
         int totalSyll = totalSyllables(words);
@@ -247,6 +272,9 @@ int fleschIndex(vector<string>words, int numSentences, int numWords)
         return round((206.835 - (a*84.6) - (b*1.015)));
 }
 
+//method to calculate the dale-chall index
+//precondition: pass in the vector of words (strings), the number of sentences in a file, and the number of words in a file
+//postcondition: return a double with the dale-chall index 
 double daleChallIndex(vector<string> words, int numSentences, int numWords)
 {
    	int hardWords = difficultWords(words);
